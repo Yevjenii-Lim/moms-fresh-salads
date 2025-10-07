@@ -8,8 +8,29 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
+interface OrderData {
+  sessionId: string;
+  customerInfo: {
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+    instructions: string;
+  };
+  items: Array<{
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    quantity: number;
+  }>;
+  subtotal: string;
+  tax: string;
+  total: string;
+}
+
 // Email sending function
-async function sendOrderConfirmationEmail(orderData: any) {
+async function sendOrderConfirmationEmail(orderData: OrderData) {
   try {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -41,7 +62,7 @@ async function sendOrderConfirmationEmail(orderData: any) {
         <div style="margin-bottom: 20px;">
           <h3 style="color: #333;">Order Details:</h3>
           <div style="background: white; padding: 15px; border-radius: 5px; border: 1px solid #ddd;">
-            ${orderData.items.map((item: any) => `
+            ${orderData.items.map((item) => `
               <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee;">
                 <span>${item.quantity}x ${item.name}</span>
                 <span>$${(item.price * item.quantity).toFixed(2)}</span>
@@ -95,7 +116,7 @@ async function sendOrderConfirmationEmail(orderData: any) {
         <div style="margin-bottom: 20px;">
           <h3 style="color: #333;">Items Ordered:</h3>
           <div style="background: white; padding: 15px; border-radius: 5px; border: 1px solid #ddd;">
-            ${orderData.items.map((item: any) => `
+            ${orderData.items.map((item) => `
               <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
                 <div>
                   <strong>${item.quantity}x ${item.name}</strong><br>

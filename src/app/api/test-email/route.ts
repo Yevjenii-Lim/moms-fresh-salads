@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     // Check if environment variables are set
     if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {

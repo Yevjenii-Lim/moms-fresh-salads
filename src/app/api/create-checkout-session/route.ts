@@ -5,14 +5,39 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-06-20',
 });
 
+interface CartItem {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+  quantity: number;
+}
+
+interface CustomerInfo {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  instructions?: string;
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const { items, customerInfo, subtotal, tax, total } = await request.json();
+    const { items, customerInfo, subtotal, tax, total }: {
+      items: CartItem[];
+      customerInfo: CustomerInfo;
+      subtotal: number;
+      tax: number;
+      total: number;
+    } = await request.json();
 
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: items.map((item: any) => ({
+      line_items: items.map((item: CartItem) => ({
         price_data: {
           currency: 'usd',
           product_data: {
@@ -35,13 +60,13 @@ export async function POST(request: NextRequest) {
         customerAddress: customerInfo.address,
         specialInstructions: customerInfo.instructions || '',
         items: JSON.stringify(items),
-        orderSummary: items.map((item: any) =>
+        orderSummary: items.map((item: CartItem) =>
           `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`
         ).join(' | '),
         subtotal: subtotal.toFixed(2),
         tax: tax.toFixed(2),
         total: total.toFixed(2),
-        itemCount: items.reduce((sum: number, item: any) => sum + item.quantity, 0)
+        itemCount: items.reduce((sum: number, item: CartItem) => sum + item.quantity, 0)
       },
       phone_number_collection: {
         enabled: true,
@@ -56,7 +81,7 @@ export async function POST(request: NextRequest) {
       customerPhone: customerInfo.phone,
       amountTotal: total,
       orderItems: items,
-      orderSummary: items.map((item: any) =>
+      orderSummary: items.map((item: CartItem) =>
         `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`
       ).join(' | '),
       subtotal: subtotal.toFixed(2),

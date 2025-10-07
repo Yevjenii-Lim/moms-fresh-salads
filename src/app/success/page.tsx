@@ -8,7 +8,7 @@ import Link from 'next/link';
 export default function SuccessPage() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
-  const [orderDetails, setOrderDetails] = useState<any>(null);
+  const [, ] = useState<{id: string; amount: number} | null>(null);
 
   useEffect(() => {
     if (sessionId) {
@@ -23,14 +23,14 @@ export default function SuccessPage() {
         <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
         <h1 className="text-2xl font-bold text-gray-800 mb-4">Payment Successful!</h1>
         <p className="text-gray-600 mb-6">
-          Thank you for your order! We've received your payment and will start preparing your fresh salad right away.
+          Thank you for your order! We&apos;ve received your payment and will start preparing your fresh salad right away.
         </p>
         <div className="space-y-4">
           <p className="text-sm text-gray-500">
             Order ID: {sessionId || 'N/A'}
           </p>
           <p className="text-sm text-gray-500">
-            You'll receive a confirmation email shortly.
+            You&apos;ll receive a confirmation email shortly.
           </p>
         </div>
         <Link

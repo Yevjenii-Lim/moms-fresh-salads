@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function TestEmailPage() {
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<{success?: boolean; message?: string; error?: string} | null>(null);
 
   const testEmail = async () => {
     setLoading(true);
@@ -79,12 +80,12 @@ export default function TestEmailPage() {
           </div>
           
           <div className="text-center">
-            <a 
+            <Link 
               href="/" 
               className="text-green-600 hover:text-green-700 underline"
             >
               ← Back to Menu
-            </a>
+            </Link>
           </div>
         </div>
       </div>
