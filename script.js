@@ -1,5 +1,6 @@
 // Initialize Stripe (replace with your publishable key)
-const stripe = Stripe('pk_live_51SFfWeQXAohZsmSy8jRbSFcC4SvKkO4GGg7Vj01Vlsu3uCqpbCGO4L7cZ5gTJ2oJ95JsEby1DTYj7QCzE8tP6OiF00xnbBF7eQ'); // Replace with actual key
+// For testing, use test keys that start with pk_test_
+const stripe = Stripe('pk_test_51SFfWeQXAohZsmSy8jRbSFcC4SvKkO4GGg7Vj01Vlsu3uCqpbCGO4L7cZ5gTJ2oJ95JsEby1DTYj7QCzE8tP6OiF00xnbBF7eQ'); // Test key for development
 
 // Shopping Cart System
 class ShoppingCart {
@@ -233,6 +234,13 @@ class ShoppingCart {
             localStorage.setItem('moms-salads-orders', JSON.stringify(orders));
             
             // Create Stripe Checkout Session
+            console.log('Creating Stripe checkout session...', {
+                items: this.items,
+                customerInfo: customerInfo,
+                successUrl: `${window.location.origin}/?payment=success&orderId=${order.id}`,
+                cancelUrl: `${window.location.origin}/?payment=cancelled`
+            });
+            
             const response = await fetch('/.netlify/functions/create-checkout-session', {
                 method: 'POST',
                 headers: {
@@ -246,7 +254,16 @@ class ShoppingCart {
                 })
             });
             
+            console.log('Stripe response status:', response.status);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Stripe API error:', errorText);
+                throw new Error(`Stripe API error: ${response.status} - ${errorText}`);
+            }
+            
             const { sessionId, url, error } = await response.json();
+            console.log('Stripe session response:', { sessionId, url, error });
             
             if (error) {
                 throw new Error(error);
