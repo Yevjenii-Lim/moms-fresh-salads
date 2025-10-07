@@ -452,7 +452,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 // Initialize EmailJS
 // TODO: Replace these with your actual EmailJS keys
 const EMAILJS_SERVICE_ID = 'service_vy4l0mc'; // Replace with your service ID from EmailJS
-const EMAILJS_TEMPLATE_ID = 'template_pcqlo2l'; // Replace with your template ID from EmailJS
+const EMAILJS_TEMPLATE_ID = 'template_cfklghj'; // Replace with your template ID from EmailJS
 const EMAILJS_PUBLIC_KEY = 'mF6Mo-BPRtWYMVWgR'; // Replace with your public key from EmailJS
 
 // Initialize EmailJS when the page loads
