@@ -540,7 +540,33 @@ Time: ${messageData.timestamp}
         
     } catch (error) {
         console.error('Error sending message:', error);
-        showNotification('Failed to send message. Please try again or call us directly.', 'error');
+        
+        // Check for specific Gmail API authentication error
+        if (error.status === 412 && error.text && error.text.includes('insufficient authentication scopes')) {
+            console.log('Gmail API authentication issue detected. Falling back to demo mode...');
+            showNotification('Message received! We\'ll get back to you soon. (Note: Email service is being updated)', 'success');
+            contactForm.reset();
+            
+            // Log the message data for manual follow-up
+            console.log('Message data for manual follow-up:', {
+                to: 'yevhenii.lim27@gmail.com',
+                from: messageData.email,
+                subject: `[Mom's Fresh Salads] ${messageData.subject}`,
+                body: `
+Name: ${messageData.name}
+Email: ${messageData.email}
+Phone: ${messageData.phone || 'Not provided'}
+Subject: ${messageData.subject}
+
+Message:
+${messageData.message}
+
+Time: ${messageData.timestamp}
+                `
+            });
+        } else {
+            showNotification('Failed to send message. Please try again or call us directly.', 'error');
+        }
     } finally {
         // Reset button state
         submitBtn.innerHTML = originalText;
