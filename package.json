@@ -1,0 +1,31 @@
+{
+  "name": "moms-fresh-salads",
+  "version": "1.0.0",
+  "description": "Mom's Fresh Salads - E-commerce website with shopping cart and Stripe integration",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx live-server .",
+    "build": "echo 'Static site - no build required'",
+    "deploy": "echo 'Deployment handled by Netlify CI/CD'"
+  },
+  "keywords": [
+    "salad",
+    "e-commerce",
+    "restaurant",
+    "food",
+    "stripe",
+    "responsive"
+  ],
+  "author": "Mom's Fresh Salads",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2",
+    "serve": "^14.2.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/moms-fresh-salads.git"
+  },
+  "homepage": "https://your-custom-domain.com"
+}
