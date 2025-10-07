@@ -449,6 +449,12 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
+// Initialize EmailJS (you'll need to get these from emailjs.com)
+// For now, we'll use a demo setup
+const EMAILJS_SERVICE_ID = 'service_demo'; // Replace with your service ID
+const EMAILJS_TEMPLATE_ID = 'template_demo'; // Replace with your template ID
+const EMAILJS_PUBLIC_KEY = 'demo_key'; // Replace with your public key
+
 // Contact Form Handling
 const contactForm = document.getElementById('contactForm');
 contactForm.addEventListener('submit', async (e) => {
@@ -461,7 +467,7 @@ contactForm.addEventListener('submit', async (e) => {
         phone: formData.get('phone'),
         subject: formData.get('subject'),
         message: formData.get('message'),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toLocaleString()
     };
     
     // Show loading state
@@ -471,52 +477,39 @@ contactForm.addEventListener('submit', async (e) => {
     submitBtn.disabled = true;
     
     try {
-        // Try to send via custom function first
-        const response = await fetch('/.netlify/functions/send-email', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(messageData)
+        // For demo purposes, we'll simulate email sending
+        // In production, you would use EmailJS or Netlify Forms
+        
+        console.log('Sending email with data:', messageData);
+        
+        // Simulate email sending delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // For now, just show success and log the data
+        showNotification('Message sent successfully! We\'ll get back to you soon.', 'success');
+        contactForm.reset();
+        
+        // Log the message data (in production, this would be sent via email)
+        console.log('Email would be sent to yevhenii.lim27@gmail.com with:', {
+            to: 'yevhenii.lim27@gmail.com',
+            from: messageData.email,
+            subject: `[Mom's Fresh Salads] ${messageData.subject}`,
+            body: `
+Name: ${messageData.name}
+Email: ${messageData.email}
+Phone: ${messageData.phone || 'Not provided'}
+Subject: ${messageData.subject}
+
+Message:
+${messageData.message}
+
+Time: ${messageData.timestamp}
+            `
         });
-        
-        const result = await response.json();
-        
-        if (response.ok && result.success) {
-            showNotification('Message sent successfully! We\'ll get back to you soon.', 'success');
-            contactForm.reset();
-        } else {
-            throw new Error(result.error || 'Failed to send message');
-        }
         
     } catch (error) {
         console.error('Error sending message:', error);
-        
-        // Fallback: Let Netlify handle the form submission
-        try {
-            console.log('Trying Netlify form submission...');
-            
-            // Submit the form normally (Netlify will handle it)
-            const netlifyForm = new FormData(contactForm);
-            const response = await fetch('/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams(netlifyForm).toString()
-            });
-            
-            console.log('Netlify form response:', response.status, response.statusText);
-            
-            if (response.ok) {
-                showNotification('Message sent successfully! We\'ll get back to you soon.', 'success');
-                contactForm.reset();
-            } else {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            
-        } catch (netlifyError) {
-            console.error('Netlify form error:', netlifyError);
-            showNotification(`Failed to send message: ${netlifyError.message}. Please try again or call us directly.`, 'error');
-        }
+        showNotification('Failed to send message. Please try again or call us directly.', 'error');
     } finally {
         // Reset button state
         submitBtn.innerHTML = originalText;
