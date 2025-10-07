@@ -449,11 +449,21 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Initialize EmailJS (you'll need to get these from emailjs.com)
-// For now, we'll use a demo setup
-const EMAILJS_SERVICE_ID = 'service_demo'; // Replace with your service ID
-const EMAILJS_TEMPLATE_ID = 'template_demo'; // Replace with your template ID
-const EMAILJS_PUBLIC_KEY = 'demo_key'; // Replace with your public key
+// Initialize EmailJS
+// TODO: Replace these with your actual EmailJS keys
+const EMAILJS_SERVICE_ID = 'service_demo'; // Replace with your service ID from EmailJS
+const EMAILJS_TEMPLATE_ID = 'template_demo'; // Replace with your template ID from EmailJS
+const EMAILJS_PUBLIC_KEY = 'demo_key'; // Replace with your public key from EmailJS
+
+// Initialize EmailJS when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    if (EMAILJS_PUBLIC_KEY !== 'demo_key') {
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+        console.log('EmailJS initialized successfully');
+    } else {
+        console.log('EmailJS not initialized - using demo mode');
+    }
+});
 
 // Contact Form Handling
 const contactForm = document.getElementById('contactForm');
@@ -477,24 +487,44 @@ contactForm.addEventListener('submit', async (e) => {
     submitBtn.disabled = true;
     
     try {
-        // For demo purposes, we'll simulate email sending
-        // In production, you would use EmailJS or Netlify Forms
-        
         console.log('Sending email with data:', messageData);
         
-        // Simulate email sending delay
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // For now, just show success and log the data
-        showNotification('Message sent successfully! We\'ll get back to you soon.', 'success');
-        contactForm.reset();
-        
-        // Log the message data (in production, this would be sent via email)
-        console.log('Email would be sent to yevhenii.lim27@gmail.com with:', {
-            to: 'yevhenii.lim27@gmail.com',
-            from: messageData.email,
-            subject: `[Mom's Fresh Salads] ${messageData.subject}`,
-            body: `
+        // Check if EmailJS is properly configured
+        if (EMAILJS_PUBLIC_KEY !== 'demo_key' && EMAILJS_SERVICE_ID !== 'service_demo') {
+            // Use EmailJS for real email sending
+            console.log('Using EmailJS to send email...');
+            
+            const templateParams = {
+                name: messageData.name,
+                email: messageData.email,
+                phone: messageData.phone || 'Not provided',
+                subject: messageData.subject,
+                message: messageData.message,
+                timestamp: messageData.timestamp
+            };
+            
+            const response = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+            console.log('EmailJS response:', response);
+            
+            showNotification('Message sent successfully! We\'ll get back to you soon.', 'success');
+            contactForm.reset();
+            
+        } else {
+            // Demo mode - simulate email sending
+            console.log('Using demo mode - simulating email sending...');
+            
+            // Simulate email sending delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            showNotification('Message sent successfully! We\'ll get back to you soon.', 'success');
+            contactForm.reset();
+            
+            // Log the message data (in production, this would be sent via email)
+            console.log('Email would be sent to yevhenii.lim27@gmail.com with:', {
+                to: 'yevhenii.lim27@gmail.com',
+                from: messageData.email,
+                subject: `[Mom's Fresh Salads] ${messageData.subject}`,
+                body: `
 Name: ${messageData.name}
 Email: ${messageData.email}
 Phone: ${messageData.phone || 'Not provided'}
@@ -504,8 +534,9 @@ Message:
 ${messageData.message}
 
 Time: ${messageData.timestamp}
-            `
-        });
+                `
+            });
+        }
         
     } catch (error) {
         console.error('Error sending message:', error);
