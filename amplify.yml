@@ -7,13 +7,13 @@ frontend:
         - npm install
     build:
       commands:
-        - echo "Building the website..."
-        - echo "No build step needed for static site"
+        - echo "Building Next.js application..."
+        - npm run build
   artifacts:
-    baseDirectory: .
+    baseDirectory: .next
     files:
       - '**/*'
   cache:
     paths:
       - node_modules/**/*
-      - .git/**/*
+      - .next/cache/**/*

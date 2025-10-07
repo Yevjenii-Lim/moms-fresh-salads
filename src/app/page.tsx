@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { ShoppingCart, Menu, X, Plus, Minus, CreditCard, Mail, Phone, MapPin } from 'lucide-react';
 
 interface MenuItem {
   id: string;
@@ -91,6 +90,23 @@ export default function Home() {
     setCart(prev => prev.filter(item => item.id !== itemId));
   };
 
+  // Handle swipe to close cart on mobile
+  const handleCartTouchStart = (e: React.TouchEvent) => {
+    const touchStartX = e.touches[0].clientX;
+    e.currentTarget.setAttribute('data-touch-start', touchStartX.toString());
+  };
+
+  const handleCartTouchEnd = (e: React.TouchEvent) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchStartX = parseFloat(e.currentTarget.getAttribute('data-touch-start') || '0');
+    const swipeDistance = touchEndX - touchStartX;
+    
+    // If swiped right more than 100px, close cart
+    if (swipeDistance > 100) {
+      setIsCartOpen(false);
+    }
+  };
+
   const updateQuantity = (itemId: string, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(itemId);
@@ -138,7 +154,6 @@ export default function Home() {
   };
 
   const showNotification = (message: string) => {
-    // Simple notification - you can enhance this with a proper toast library
     alert(message);
   };
 
@@ -173,93 +188,81 @@ export default function Home() {
     }
   };
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      {/* Header */}
-      <header className="bg-white shadow-lg sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-green-600">🍽️ Mom's Fresh Salads</h1>
-            </div>
-            
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-8">
-              <a href="#menu" className="text-gray-700 hover:text-green-600 transition-colors">Menu</a>
-              <a href="#about" className="text-gray-700 hover:text-green-600 transition-colors">About</a>
-              <a href="#contact" className="text-gray-700 hover:text-green-600 transition-colors">Contact</a>
-            </nav>
-
-            {/* Cart Button */}
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="relative bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
-            >
-              <ShoppingCart size={20} />
-              <span>Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)})</span>
+    <div className="min-h-screen">
+      {/* Navigation */}
+      <nav className="navbar">
+        <div className="nav-container">
+          <div className="nav-logo">
+            <i className="fas fa-leaf"></i>
+            <span>Mom&apos;s Fresh Salads</span>
+          </div>
+          <ul className={`nav-menu ${isMobileMenuOpen ? 'active' : ''}`}>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#menu">Menu</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+          <div className="nav-actions">
+            <button className="cart-toggle" onClick={() => setIsCartOpen(true)}>
+              <i className="fas fa-shopping-cart"></i>
+              <span className="cart-count">{cart.reduce((sum, item) => sum + item.quantity, 0)}</span>
             </button>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2"
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+          </div>
+          <div className={`hamburger ${isMobileMenuOpen ? 'active' : ''}`} onClick={toggleMobileMenu}>
+            <span></span>
+            <span></span>
+            <span></span>
           </div>
         </div>
-
-        {/* Mobile Navigation */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden bg-white border-t">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              <a href="#menu" className="block px-3 py-2 text-gray-700 hover:text-green-600">Menu</a>
-              <a href="#about" className="block px-3 py-2 text-gray-700 hover:text-green-600">About</a>
-              <a href="#contact" className="block px-3 py-2 text-gray-700 hover:text-green-600">Contact</a>
-            </div>
-          </div>
-        )}
-      </header>
+      </nav>
 
       {/* Hero Section */}
-      <section className="py-20 text-center">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-5xl font-bold text-gray-800 mb-6">
-            Fresh, Healthy, Delicious Salads
-          </h2>
-          <p className="text-xl text-gray-600 mb-8">
-            Made with love and the freshest ingredients, delivered right to your door
-          </p>
-          <a
-            href="#menu"
-            className="bg-green-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-green-700 transition-colors inline-block"
-          >
-            Order Now
-          </a>
+      <section id="home" className="hero">
+        <div className="hero-content">
+          <div>
+            <h1>Fresh, Healthy Salads Made with Love</h1>
+            <p>Discover the perfect blend of crisp vegetables, premium ingredients, and homemade dressings crafted by mom&apos;s skilled hands.</p>
+            <div className="hero-buttons">
+              <a href="#menu" className="btn btn-primary">View Menu</a>
+              <a href="#contact" className="btn btn-secondary">Contact Us</a>
+            </div>
+          </div>
+          <div className="hero-image">
+            <div className="salad-placeholder">
+              <i className="fas fa-seedling"></i>
+              <p>Fresh Salad Image</p>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Menu Section */}
-      <section id="menu" className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center text-gray-800 mb-12">Our Menu</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <section id="menu" className="menu">
+        <div className="container">
+          <h2>Our Signature Salads</h2>
+          <div className="menu-grid">
             {menuItems.map((item) => (
-              <div key={item.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-                <div className="p-6">
-                  <div className="text-6xl text-center mb-4">{item.image}</div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">{item.name}</h3>
-                  <p className="text-gray-600 mb-4">{item.description}</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-2xl font-bold text-green-600">${item.price.toFixed(2)}</span>
-                    <button
-                      onClick={() => addToCart(item)}
-                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
-                    >
-                      <Plus size={16} />
-                      <span>Add to Cart</span>
-                    </button>
-                  </div>
+              <div key={item.id} className={`menu-item ${item.id === 'test' ? 'test-item' : ''}`}>
+                <div className="menu-image">
+                  <i className="fas fa-image"></i>
+                </div>
+                <div className="menu-content">
+                  <h3>{item.name}</h3>
+                  <p>{item.description}</p>
+                  <div className="price">${item.price.toFixed(2)}</div>
+                  <button
+                    onClick={() => addToCart(item)}
+                    className="btn btn-add-to-cart"
+                  >
+                    <i className="fas fa-plus"></i>
+                    {item.id === 'test' ? 'Test Payment' : 'Add to Cart'}
+                  </button>
                 </div>
               </div>
             ))}
@@ -268,86 +271,70 @@ export default function Home() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold text-gray-800 mb-8">About Mom's Fresh Salads</h2>
-          <p className="text-lg text-gray-600 mb-6">
-            We believe that healthy eating should be delicious and convenient. Our salads are made with 
-            the freshest ingredients, sourced locally whenever possible, and prepared with love.
-          </p>
-          <p className="text-lg text-gray-600">
-            From classic Caesar to innovative quinoa bowls, we have something for everyone. 
-            Order online and enjoy fresh, healthy meals delivered to your door.
-          </p>
+      <section id="about" className="about">
+        <div className="container">
+          <div className="about-content">
+            <div className="about-text">
+              <h2>About Mom&apos;s Kitchen</h2>
+              <p>For over 20 years, Mom has been perfecting her salad recipes, combining traditional cooking methods with fresh, local ingredients. Each salad is prepared with the same care and attention that she would give to her own family.</p>
+              <p>Our mission is to bring healthy, delicious meals to your table while supporting local farmers and suppliers. Every ingredient is carefully selected for quality, freshness, and nutritional value.</p>
+            </div>
+            <div className="about-image">
+              <div className="chef-placeholder">
+                <i className="fas fa-user-friends"></i>
+                <p>Mom in the Kitchen</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center text-gray-800 mb-12">Contact Us</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h3 className="text-2xl font-semibold text-gray-800 mb-6">Get in Touch</h3>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <Phone className="text-green-600" size={20} />
-                  <span>(555) 123-4567</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Mail className="text-green-600" size={20} />
-                  <span>info@momsfreshsalads.com</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <MapPin className="text-green-600" size={20} />
-                  <span>123 Fresh Street, Healthy City, HC 12345</span>
-                </div>
+      <section id="contact" className="contact">
+        <div className="container">
+          <h2>Get in Touch</h2>
+          <div className="contact-content">
+            <div className="contact-info">
+              <h3>Contact Information</h3>
+              <div className="contact-item">
+                <i className="fas fa-phone"></i>
+                <span>(555) 123-SALAD</span>
+              </div>
+              <div className="contact-item">
+                <i className="fas fa-envelope"></i>
+                <span>orders@momsfreshsalads.com</span>
+              </div>
+              <div className="contact-item">
+                <i className="fas fa-map-marker-alt"></i>
+                <span>123 Fresh Street<br />Healthy City, HC 12345</span>
+              </div>
+              <div className="hours">
+                <h4>Business Hours</h4>
+                <p>Monday - Friday: 10:00 AM - 7:00 PM<br />
+                Saturday: 9:00 AM - 6:00 PM<br />
+                Sunday: Closed</p>
               </div>
             </div>
-            <div>
-              <h3 className="text-2xl font-semibold text-gray-800 mb-6">Send us a Message</h3>
-              <form onSubmit={handleContactSubmit} className="space-y-4">
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Your Name"
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                />
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Your Email"
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                />
-                <input
-                  type="tel"
-                  name="phone"
-                  placeholder="Your Phone"
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                />
-                <input
-                  type="text"
-                  name="subject"
-                  placeholder="Subject"
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                />
-                <textarea
-                  name="message"
-                  placeholder="Your Message"
-                  rows={4}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                />
-                <button
-                  type="submit"
-                  className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  Send Message
-                </button>
+            <div className="contact-form">
+              <h3>Send us a Message</h3>
+              <form onSubmit={handleContactSubmit}>
+                <div className="form-group">
+                  <label htmlFor="name">Full Name</label>
+                  <input type="text" id="name" name="name" required />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="email">Email</label>
+                  <input type="email" id="email" name="email" required />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="subject">Subject</label>
+                  <input type="text" id="subject" name="subject" required />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="message">Message</label>
+                  <textarea id="message" name="message" rows={4} required></textarea>
+                </div>
+                <button type="submit" className="btn btn-primary">Send Message</button>
               </form>
             </div>
           </div>
@@ -357,41 +344,59 @@ export default function Home() {
       {/* Cart Sidebar */}
       {isCartOpen && (
         <div className="fixed inset-0 z-50 overflow-hidden">
-          <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setIsCartOpen(false)} />
-          <div className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-xl">
+          <div className="cart-overlay active" onClick={() => setIsCartOpen(false)} />
+          <div 
+            className="cart-sidebar active"
+            onTouchStart={handleCartTouchStart}
+            onTouchEnd={handleCartTouchEnd}
+          >
             <div className="flex flex-col h-full">
-              <div className="flex items-center justify-between p-4 border-b">
-                <h3 className="text-lg font-semibold">Shopping Cart</h3>
-                <button onClick={() => setIsCartOpen(false)}>
-                  <X size={24} />
-                </button>
+              <div className="cart-header">
+                <h3>Your Cart</h3>
+                <div className="cart-header-actions">
+                  <div className="swipe-hint">← Swipe to close</div>
+                  <button className="cart-close" onClick={() => setIsCartOpen(false)}>
+                    <i className="fas fa-times"></i>
+                    <span className="close-label">Close</span>
+                  </button>
+                </div>
               </div>
               
-              <div className="flex-1 overflow-y-auto p-4">
+              <div className="cart-items">
                 {cart.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">Your cart is empty</p>
+                  <div className="cart-empty">
+                    <i className="fas fa-shopping-cart"></i>
+                    <p>Your cart is empty</p>
+                    <a href="#menu" className="btn btn-primary" onClick={() => setIsCartOpen(false)}>Browse Menu</a>
+                  </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div>
                     {cart.map((item) => (
-                      <div key={item.id} className="flex items-center space-x-3 p-3 border rounded-lg">
+                      <div key={item.id} className="cart-item">
                         <div className="text-2xl">{item.image}</div>
-                        <div className="flex-1">
-                          <h4 className="font-medium">{item.name}</h4>
-                          <p className="text-sm text-gray-600">${item.price.toFixed(2)} each</p>
+                        <div className="cart-item-info">
+                          <div className="cart-item-name">{item.name}</div>
+                          <div className="cart-item-price">${item.price.toFixed(2)} each</div>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="cart-item-controls">
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            className="p-1 rounded-full hover:bg-gray-100"
+                            className="quantity-btn"
                           >
-                            <Minus size={16} />
+                            -
                           </button>
-                          <span className="w-8 text-center">{item.quantity}</span>
+                          <span className="cart-item-quantity">{item.quantity}</span>
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="p-1 rounded-full hover:bg-gray-100"
+                            className="quantity-btn"
                           >
-                            <Plus size={16} />
+                            +
+                          </button>
+                          <button
+                            onClick={() => removeFromCart(item.id)}
+                            className="remove-item"
+                          >
+                            Remove
                           </button>
                         </div>
                       </div>
@@ -401,30 +406,30 @@ export default function Home() {
               </div>
               
               {cart.length > 0 && (
-                <div className="border-t p-4">
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between">
+                <div className="cart-footer">
+                  <div className="cart-total">
+                    <div className="total-line">
                       <span>Subtotal:</span>
                       <span>${getTotalPrice().subtotal.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Tax:</span>
+                    <div className="total-line">
+                      <span>Tax (8%):</span>
                       <span>${getTotalPrice().tax.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between font-bold text-lg">
+                    <div className="total-line total-final">
                       <span>Total:</span>
                       <span>${getTotalPrice().total.toFixed(2)}</span>
                     </div>
                   </div>
                   <button
+                    className="btn-checkout"
                     onClick={() => {
                       setIsCartOpen(false);
                       setShowCheckout(true);
                     }}
-                    className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
                   >
-                    <CreditCard size={20} />
-                    <span>Checkout</span>
+                    <i className="fas fa-credit-card"></i>
+                    Proceed to Checkout
                   </button>
                 </div>
               )}
@@ -443,7 +448,7 @@ export default function Home() {
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-xl font-semibold">Checkout</h3>
                   <button onClick={() => setShowCheckout(false)}>
-                    <X size={24} />
+                    <span className="text-2xl">×</span>
                   </button>
                 </div>
                 
@@ -519,7 +524,7 @@ export default function Home() {
                       onClick={processPayment}
                       className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
                     >
-                      <CreditCard size={20} />
+                      <span>💳</span>
                       <span>Pay ${getTotalPrice().total.toFixed(2)}</span>
                     </button>
                   </div>
@@ -531,15 +536,28 @@ export default function Home() {
       )}
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-white py-8">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h3 className="text-2xl font-bold mb-4">🍽️ Mom's Fresh Salads</h3>
-          <p className="text-gray-300 mb-4">
-            Fresh, healthy, delicious salads made with love
-          </p>
-          <p className="text-sm text-gray-400">
-            © 2024 Mom's Fresh Salads. All rights reserved.
-          </p>
+      <footer className="footer">
+        <div className="container">
+          <div className="footer-content">
+            <div className="footer-logo">
+              <i className="fas fa-leaf"></i>
+              <span>Mom&apos;s Fresh Salads</span>
+            </div>
+            <div className="footer-links">
+              <a href="#home">Home</a>
+              <a href="#menu">Menu</a>
+              <a href="#about">About</a>
+              <a href="#contact">Contact</a>
+            </div>
+            <div className="social-links">
+              <a href="#"><i className="fab fa-facebook"></i></a>
+              <a href="#"><i className="fab fa-instagram"></i></a>
+              <a href="#"><i className="fab fa-twitter"></i></a>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <p>&copy; 2024 Mom&apos;s Fresh Salads. Made with ❤️ for healthy living.</p>
+          </div>
         </div>
       </footer>
     </div>

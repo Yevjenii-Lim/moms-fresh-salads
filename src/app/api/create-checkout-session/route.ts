@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
           product_data: {
             name: item.name,
             description: item.description,
+            images: [item.image],
           },
           unit_amount: Math.round(item.price * 100), // Convert to cents
         },
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
         customerPhone: customerInfo.phone,
         customerAddress: customerInfo.address,
         specialInstructions: customerInfo.instructions || '',
-        orderItems: JSON.stringify(items),
+        items: JSON.stringify(items),
         orderSummary: items.map((item: any) =>
           `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`
         ).join(' | '),
@@ -62,6 +63,9 @@ export async function POST(request: NextRequest) {
       tax: tax.toFixed(2),
       total: total.toFixed(2)
     });
+
+    // Email will be sent via webhook after successful payment
+    console.log('✅ Checkout session created, emails will be sent after payment completion');
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
