@@ -213,16 +213,7 @@ class ShoppingCart {
 
     async processPayment(customerInfo) {
         try {
-            // In a real application, you would:
-            // 1. Send order data to your backend
-            // 2. Create a payment intent with Stripe
-            // 3. Process the payment
-            
-            // For demo purposes, we'll simulate the payment process
-            showNotification('Processing payment...', 'info');
-            
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            showNotification('Redirecting to secure checkout...', 'info');
             
             // Create order object
             const order = {
@@ -232,23 +223,41 @@ class ShoppingCart {
                 subtotal: this.getSubtotal(),
                 tax: this.getTax(),
                 total: this.getTotal(),
-                status: 'confirmed',
+                status: 'pending',
                 timestamp: new Date().toISOString()
             };
             
-            // Save order to localStorage (in real app, send to server)
+            // Save order to localStorage for reference
             const orders = JSON.parse(localStorage.getItem('moms-salads-orders') || '[]');
             orders.push(order);
             localStorage.setItem('moms-salads-orders', JSON.stringify(orders));
             
-            // Clear cart and show success
-            this.clear();
-            this.closeCheckout();
-            this.showOrderConfirmation(order);
+            // Create Stripe Checkout Session
+            const response = await fetch('/.netlify/functions/create-checkout-session', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    items: this.items,
+                    customerInfo: customerInfo,
+                    successUrl: `${window.location.origin}/?payment=success&orderId=${order.id}`,
+                    cancelUrl: `${window.location.origin}/?payment=cancelled`
+                })
+            });
+            
+            const { sessionId, url, error } = await response.json();
+            
+            if (error) {
+                throw new Error(error);
+            }
+            
+            // Redirect to Stripe Checkout
+            window.location.href = url;
             
         } catch (error) {
             console.error('Payment failed:', error);
-            showNotification('Payment failed. Please try again.', 'error');
+            showNotification(`Payment setup failed: ${error.message}`, 'error');
         }
     }
 
@@ -499,9 +508,50 @@ window.addEventListener('scroll', () => {
     }
 });
 
+// Handle payment success/cancel from URL parameters
+function handlePaymentResult() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment');
+    const orderId = urlParams.get('orderId');
+    
+    if (paymentStatus === 'success' && orderId) {
+        // Find the order in localStorage
+        const orders = JSON.parse(localStorage.getItem('moms-salads-orders') || '[]');
+        const order = orders.find(o => o.id.toString() === orderId);
+        
+        if (order) {
+            // Update order status
+            order.status = 'confirmed';
+            order.paymentStatus = 'completed';
+            order.completedAt = new Date().toISOString();
+            
+            // Update localStorage
+            const updatedOrders = orders.map(o => o.id === order.id ? order : o);
+            localStorage.setItem('moms-salads-orders', JSON.stringify(updatedOrders));
+            
+            // Show success message
+            showNotification('Payment successful! Your order has been confirmed.', 'success');
+            
+            // Clear cart
+            if (cart) {
+                cart.clear();
+            }
+            
+            // Clean URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    } else if (paymentStatus === 'cancelled') {
+        showNotification('Payment was cancelled. You can try again anytime.', 'info');
+        
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+}
+
 // Initialize the shopping cart
 let cart;
 document.addEventListener('DOMContentLoaded', () => {
     cart = new ShoppingCart();
-    console.log('Mom\'s Fresh Salads website with cart system loaded successfully!');
+    handlePaymentResult(); // Check for payment results
+    console.log('Mom\'s Fresh Salads website with Stripe Checkout loaded successfully!');
 });

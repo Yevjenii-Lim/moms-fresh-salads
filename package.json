@@ -19,6 +19,9 @@
   ],
   "author": "Mom's Fresh Salads",
   "license": "MIT",
+  "dependencies": {
+    "stripe": "^14.0.0"
+  },
   "devDependencies": {
     "live-server": "^1.2.2",
     "serve": "^14.2.1"
