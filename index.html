@@ -40,6 +40,15 @@
     <!-- Mobile Navigation Overlay -->
     <div class="nav-overlay" id="navOverlay"></div>
 
+    <!-- Hidden form for Netlify form detection -->
+    <form name="contact" netlify netlify-honeypot="bot-field" hidden>
+        <input type="text" name="name" />
+        <input type="email" name="email" />
+        <input type="tel" name="phone" />
+        <input type="text" name="subject" />
+        <textarea name="message"></textarea>
+    </form>
+
     <!-- Shopping Cart Sidebar -->
     <div class="cart-sidebar" id="cartSidebar">
         <div class="cart-header">
@@ -231,7 +240,7 @@
                 </div>
                 <div class="contact-form">
                     <h3>Send us a Message</h3>
-                    <form id="contactForm" name="contact" method="POST" data-netlify="true" data-netlify-honeypot="bot-field">
+                    <form id="contactForm" name="contact" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" netlify>
                         <!-- Hidden field for Netlify -->
                         <input type="hidden" name="form-name" value="contact" />
                         <div style="display: none;">

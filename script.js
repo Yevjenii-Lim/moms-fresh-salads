@@ -494,20 +494,28 @@ contactForm.addEventListener('submit', async (e) => {
         
         // Fallback: Let Netlify handle the form submission
         try {
+            console.log('Trying Netlify form submission...');
+            
             // Submit the form normally (Netlify will handle it)
             const netlifyForm = new FormData(contactForm);
-            await fetch('/', {
+            const response = await fetch('/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams(netlifyForm).toString()
             });
             
-            showNotification('Message sent successfully! We\'ll get back to you soon.', 'success');
-            contactForm.reset();
+            console.log('Netlify form response:', response.status, response.statusText);
+            
+            if (response.ok) {
+                showNotification('Message sent successfully! We\'ll get back to you soon.', 'success');
+                contactForm.reset();
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
             
         } catch (netlifyError) {
             console.error('Netlify form error:', netlifyError);
-            showNotification('Failed to send message. Please try again or call us directly.', 'error');
+            showNotification(`Failed to send message: ${netlifyError.message}. Please try again or call us directly.`, 'error');
         }
     } finally {
         // Reset button state
