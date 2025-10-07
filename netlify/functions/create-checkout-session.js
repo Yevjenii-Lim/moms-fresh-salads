@@ -75,6 +75,14 @@ exports.handler = async (event, context) => {
         customerPhone: customerInfo.phone,
         customerAddress: customerInfo.address,
         specialInstructions: customerInfo.instructions || '',
+        orderItems: JSON.stringify(items),
+        orderSummary: items.map(item => 
+          `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`
+        ).join(' | '),
+        subtotal: subtotal.toFixed(2),
+        tax: taxAmount.toFixed(2),
+        total: (subtotal + taxAmount).toFixed(2),
+        itemCount: items.reduce((sum, item) => sum + item.quantity, 0)
       },
       shipping_address_collection: {
         allowed_countries: ['US'],
