@@ -22,7 +22,7 @@ export default function TestEmailPage() {
       const data = await response.json();
       setResult(data);
     } catch (error) {
-      setResult({ error: 'Failed to test email', details: error });
+      setResult({ error: 'Failed to test email' });
     } finally {
       setLoading(false);
     }
