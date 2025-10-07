@@ -1,180 +1,268 @@
-# Deployment Guide - Mom's Fresh Salads
+# 🚀 Next.js Deployment Guide
 
-This guide will help you deploy your website with CI/CD using GitHub and Netlify.
+This guide covers deploying your Mom's Fresh Salads Next.js application to various platforms.
 
-## Prerequisites
+## 📋 Prerequisites
 
-- ✅ Custom domain name purchased
-- ✅ GitHub account
-- ✅ Netlify account
-- ✅ Stripe account (for payments)
+- Next.js application built and tested locally
+- Environment variables configured
+- Stripe account with API keys
+- Gmail account with App Password
 
-## Step-by-Step Deployment
+## 🎯 Deployment Options
 
-### 1. GitHub Repository Setup
+### 1. Vercel (Recommended for Next.js)
 
-1. **Create GitHub Repository:**
-   - Go to [GitHub.com](https://github.com)
-   - Click "New repository"
-   - Name: `moms-fresh-salads`
-   - Description: "Mom's Fresh Salads - E-commerce website"
-   - Make it Public
-   - Don't initialize with README (we have one)
+Vercel is the company behind Next.js and offers the best integration.
 
-2. **Connect Local Repository:**
+#### Steps:
+1. **Push to GitHub:**
    ```bash
-   git remote add origin https://github.com/YOUR_USERNAME/moms-fresh-salads.git
-   git push -u origin main
+   git add .
+   git commit -m "Initial Next.js version"
+   git push origin main
    ```
 
-### 2. Netlify Setup
+2. **Deploy to Vercel:**
+   - Go to [vercel.com](https://vercel.com)
+   - Sign up/login with GitHub
+   - Click "New Project"
+   - Import your repository
+   - Configure environment variables:
+     ```
+     STRIPE_SECRET_KEY=sk_test_your_key
+     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_key
+     GMAIL_USER=your-email@gmail.com
+     GMAIL_APP_PASSWORD=your-app-password
+     ```
+   - Click "Deploy"
 
-1. **Connect to GitHub:**
-   - Go to [Netlify.com](https://netlify.com)
-   - Sign up/Login
-   - Click "New site from Git"
-   - Choose "GitHub"
-   - Authorize Netlify
+3. **Custom Domain (Optional):**
+   - Go to Project Settings → Domains
+   - Add your custom domain
+   - Update DNS records as instructed
+
+### 2. AWS Amplify
+
+#### Steps:
+1. **Push to GitHub** (same as above)
+
+2. **Deploy to Amplify:**
+   - Go to [AWS Amplify Console](https://console.aws.amazon.com/amplify/)
+   - Click "New app" → "Host web app"
+   - Connect GitHub repository
+   - Select branch: `main`
+   - Build settings (auto-detected):
+     ```yaml
+     version: 1
+     frontend:
+       phases:
+         preBuild:
+           commands:
+             - npm install
+         build:
+           commands:
+             - npm run build
+       artifacts:
+         baseDirectory: .next
+         files:
+           - '**/*'
+       cache:
+         paths:
+           - node_modules/**/*
+           - .next/cache/**/*
+     ```
+
+3. **Environment Variables:**
+   - Go to App Settings → Environment variables
+   - Add all required variables
+
+4. **Deploy:**
+   - Click "Save and deploy"
+
+### 3. Netlify
+
+#### Steps:
+1. **Build Configuration:**
+   Create `netlify.toml`:
+   ```toml
+   [build]
+     command = "npm run build"
+     publish = ".next"
+   
+   [[redirects]]
+     from = "/*"
+     to = "/index.html"
+     status = 200
+   ```
+
+2. **Deploy:**
+   - Go to [netlify.com](https://netlify.com)
+   - Import from Git
+   - Add environment variables
+   - Deploy
+
+### 4. Railway
+
+#### Steps:
+1. **Connect GitHub:**
+   - Go to [railway.app](https://railway.app)
+   - Connect your GitHub account
    - Select your repository
 
-2. **Build Settings:**
-   - Build command: `echo 'Static site - no build required'`
-   - Publish directory: `.` (root)
-   - Base directory: (leave empty)
+2. **Configure:**
+   - Add environment variables
+   - Railway auto-detects Next.js
+   - Deploy automatically
 
-3. **Deploy:**
-   - Click "Deploy site"
-   - Wait for deployment to complete
+## 🔧 Environment Variables
 
-### 3. Custom Domain Configuration
+### Required Variables:
+```env
+# Stripe Configuration
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
 
-1. **Add Custom Domain:**
-   - In Netlify dashboard → Site settings → Domain management
-   - Click "Add custom domain"
-   - Enter your domain (e.g., `momsfreshsalads.com`)
+# Email Configuration
+GMAIL_USER=your-gmail@gmail.com
+GMAIL_APP_PASSWORD=your-16-character-app-password
 
-2. **DNS Configuration:**
-   Netlify will provide DNS records. Configure these in your domain registrar:
+# Optional: Webhook Secret
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
+```
 
-   **For Root Domain (momsfreshsalads.com):**
-   ```
-   Type: A
-   Name: @
-   Value: 75.2.60.5
-   ```
+### Production Variables:
+When ready for production, replace test keys with live keys:
+```env
+STRIPE_SECRET_KEY=sk_live_your_live_stripe_secret_key
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_your_live_stripe_publishable_key
+```
 
-   **For WWW Subdomain:**
-   ```
-   Type: CNAME
-   Name: www
-   Value: your-site-name.netlify.app
-   ```
+## 🧪 Testing After Deployment
 
-3. **SSL Certificate:**
-   - Netlify automatically provides free SSL
-   - Enable "Force HTTPS" in Site settings → Domain management
+### 1. Basic Functionality:
+- [ ] Website loads correctly
+- [ ] Navigation works
+- [ ] Menu items display
+- [ ] Cart functionality works
 
-### 4. Environment Variables (Optional)
+### 2. Payment Testing:
+- [ ] Add items to cart
+- [ ] Proceed to checkout
+- [ ] Fill customer information
+- [ ] Use test card: `4242 4242 4242 4242`
+- [ ] Complete payment
+- [ ] Check success page
 
-If you want to use environment variables for sensitive data:
+### 3. Email Testing:
+- [ ] Submit contact form
+- [ ] Check email delivery
+- [ ] Verify email content
 
-1. **In Netlify Dashboard:**
-   - Site settings → Environment variables
-   - Add variables like:
-     - `STRIPE_PUBLISHABLE_KEY`
-     - `STRIPE_SECRET_KEY`
+### 4. Mobile Testing:
+- [ ] Test on mobile devices
+- [ ] Check responsive design
+- [ ] Test touch interactions
 
-2. **Update script.js to use environment variables:**
-   ```javascript
-   const stripe = Stripe(process.env.STRIPE_PUBLISHABLE_KEY);
-   ```
-
-### 5. Form Handling
-
-Your contact form will work automatically with Netlify Forms:
-
-1. **Enable Forms:**
-   - Site settings → Forms
-   - Forms are automatically detected
-
-2. **View Submissions:**
-   - Netlify dashboard → Forms
-   - View all form submissions
-
-### 6. CI/CD Pipeline
-
-Your GitHub Actions workflow will automatically:
-
-1. **Trigger on:**
-   - Push to `main` branch
-   - Pull requests to `main`
-
-2. **Actions:**
-   - Checkout code
-   - Setup Node.js
-   - Install dependencies
-   - Build site
-   - Deploy to Netlify
-
-### 7. Testing Your Deployment
-
-1. **Test the website:**
-   - Visit your custom domain
-   - Test all functionality:
-     - Navigation
-     - Shopping cart
-     - Contact form
-     - Mobile responsiveness
-
-2. **Test CI/CD:**
-   - Make a small change to your code
-   - Commit and push to GitHub
-   - Watch Netlify automatically deploy
-
-## Production Checklist
-
-- [ ] Custom domain configured and working
-- [ ] HTTPS enabled
-- [ ] Stripe keys updated for production
-- [ ] Contact form working
-- [ ] Shopping cart functional
-- [ ] Mobile responsive
-- [ ] All links working
-- [ ] Images optimized
-- [ ] SEO meta tags added
-- [ ] Analytics configured (optional)
-
-## Troubleshooting
+## 🔍 Troubleshooting
 
 ### Common Issues:
 
-1. **Domain not working:**
-   - Check DNS propagation (can take 24-48 hours)
-   - Verify DNS records are correct
-   - Check domain registrar settings
+#### Build Failures:
+- Check Node.js version (18+)
+- Verify all dependencies are installed
+- Check for TypeScript errors
+- Review build logs
 
-2. **Build failures:**
-   - Check Netlify build logs
-   - Verify all files are committed
-   - Check for syntax errors
+#### Environment Variables:
+- Ensure all required variables are set
+- Check for typos in variable names
+- Verify values are correct
+- Redeploy after adding variables
 
-3. **Stripe not working:**
-   - Verify publishable key is correct
-   - Check Stripe dashboard for errors
-   - Ensure domain is added to Stripe allowed origins
+#### Stripe Issues:
+- Verify API keys are correct
+- Check Stripe dashboard for errors
+- Ensure test/live keys match environment
+- Test with Stripe test cards
 
-### Support:
+#### Email Issues:
+- Verify Gmail App Password
+- Check spam folder
+- Test email configuration
+- Review email service logs
 
-- **Netlify Docs:** [docs.netlify.com](https://docs.netlify.com)
-- **GitHub Actions:** [docs.github.com/actions](https://docs.github.com/actions)
-- **Stripe Docs:** [stripe.com/docs](https://stripe.com/docs)
+### Performance Optimization:
 
-## Next Steps
+#### Next.js Optimizations:
+- Enable image optimization
+- Use dynamic imports for large components
+- Implement proper caching
+- Optimize bundle size
 
-1. **Analytics:** Add Google Analytics or similar
-2. **SEO:** Optimize meta tags and content
-3. **Performance:** Optimize images and code
-4. **Backup:** Regular backups of your code
-5. **Monitoring:** Set up uptime monitoring
+#### CDN Configuration:
+- Configure proper caching headers
+- Enable gzip compression
+- Use CDN for static assets
+- Implement proper redirects
 
-Your website is now live with professional CI/CD! 🎉
+## 📊 Monitoring
+
+### Analytics:
+- Google Analytics integration
+- Performance monitoring
+- Error tracking
+- User behavior analysis
+
+### Logs:
+- Application logs
+- Error logs
+- Performance metrics
+- Security monitoring
+
+## 🔒 Security
+
+### Best Practices:
+- Use HTTPS in production
+- Secure environment variables
+- Implement proper CORS
+- Regular security updates
+- Monitor for vulnerabilities
+
+### Stripe Security:
+- Use webhooks for payment verification
+- Implement proper error handling
+- Secure API key storage
+- Regular security audits
+
+## 📈 Scaling
+
+### Performance:
+- Implement caching strategies
+- Use CDN for static assets
+- Optimize database queries
+- Monitor performance metrics
+
+### Infrastructure:
+- Auto-scaling configuration
+- Load balancing
+- Database optimization
+- Backup strategies
+
+## 🆘 Support
+
+### Getting Help:
+- Check deployment platform documentation
+- Review Next.js documentation
+- Check Stripe documentation
+- Contact platform support
+
+### Useful Resources:
+- [Next.js Deployment](https://nextjs.org/docs/deployment)
+- [Vercel Documentation](https://vercel.com/docs)
+- [AWS Amplify Documentation](https://docs.aws.amazon.com/amplify/)
+- [Stripe Documentation](https://stripe.com/docs)
+
+---
+
+**Ready to deploy your Next.js salad website! 🚀**
