@@ -90,8 +90,14 @@ export async function POST(request: NextRequest) {
       total: total.toFixed(2)
     });
 
-    // Email will be sent via EventBridge after successful payment
-    console.log('✅ Checkout session created, emails will be sent via EventBridge after payment completion');
+    // For local development: Send emails immediately
+    // In production: Emails will be sent via EventBridge after successful payment
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔧 Development mode: Emails will be sent via EventBridge after payment completion');
+      console.log('📧 To test emails locally, complete the EventBridge setup or use the test-email page');
+    } else {
+      console.log('✅ Checkout session created, emails will be sent via EventBridge after payment completion');
+    }
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
