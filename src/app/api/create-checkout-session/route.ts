@@ -43,7 +43,8 @@ export async function POST(request: NextRequest) {
           product_data: {
             name: item.name,
             description: item.description,
-            images: [item.image],
+            // Only include images if they are valid URLs (not emojis)
+            ...(item.image && item.image.startsWith('http') ? { images: [item.image] } : {}),
           },
           unit_amount: Math.round(item.price * 100), // Convert to cents
         },
