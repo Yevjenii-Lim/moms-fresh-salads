@@ -39,14 +39,14 @@ class ShoppingCart {
         
         this.saveCart();
         this.updateCartDisplay();
-        this.showNotification(`${salad.name} added to cart!`, 'success');
+        showNotification(`${salad.name} added to cart!`, 'success');
     }
 
     removeItem(itemId) {
         this.items = this.items.filter(item => item.id !== itemId);
         this.saveCart();
         this.updateCartDisplay();
-        this.showNotification('Item removed from cart', 'info');
+        showNotification('Item removed from cart', 'info');
     }
 
     updateQuantity(itemId, newQuantity) {
@@ -219,7 +219,7 @@ class ShoppingCart {
             // 3. Process the payment
             
             // For demo purposes, we'll simulate the payment process
-            this.showNotification('Processing payment...', 'info');
+            showNotification('Processing payment...', 'info');
             
             // Simulate API call
             await new Promise(resolve => setTimeout(resolve, 2000));
@@ -248,7 +248,7 @@ class ShoppingCart {
             
         } catch (error) {
             console.error('Payment failed:', error);
-            this.showNotification('Payment failed. Please try again.', 'error');
+            showNotification('Payment failed. Please try again.', 'error');
         }
     }
 
