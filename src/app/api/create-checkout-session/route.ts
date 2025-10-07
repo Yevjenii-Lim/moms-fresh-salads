@@ -97,6 +97,7 @@ export async function POST(request: NextRequest) {
       console.log('📧 To test emails locally, complete the EventBridge setup or use the test-email page');
     } else {
       console.log('✅ Checkout session created, emails will be sent via EventBridge after payment completion');
+      console.log('🚀 Deployment version: ' + new Date().toISOString());
     }
 
     return NextResponse.json({ url: session.url });
