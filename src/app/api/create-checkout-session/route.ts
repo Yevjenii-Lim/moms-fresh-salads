@@ -89,8 +89,8 @@ export async function POST(request: NextRequest) {
       total: total.toFixed(2)
     });
 
-    // Email will be sent via webhook after successful payment
-    console.log('✅ Checkout session created, emails will be sent after payment completion');
+    // Email will be sent via EventBridge after successful payment
+    console.log('✅ Checkout session created, emails will be sent via EventBridge after payment completion');
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
