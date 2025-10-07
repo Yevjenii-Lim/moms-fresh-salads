@@ -393,20 +393,46 @@ function getNotificationColor(type) {
 }
 
 // Mobile Navigation Toggle
-const hamburger = document.querySelector('.hamburger');
+const hamburger = document.getElementById('hamburger');
 const navMenu = document.querySelector('.nav-menu');
+const navOverlay = document.getElementById('navOverlay');
 
-hamburger.addEventListener('click', () => {
+function toggleMobileMenu() {
     hamburger.classList.toggle('active');
     navMenu.classList.toggle('active');
-});
+    navOverlay.classList.toggle('active');
+    
+    // Prevent body scroll when menu is open
+    if (navMenu.classList.contains('active')) {
+        document.body.style.overflow = 'hidden';
+    } else {
+        document.body.style.overflow = '';
+    }
+}
+
+function closeMobileMenu() {
+    hamburger.classList.remove('active');
+    navMenu.classList.remove('active');
+    navOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Hamburger click event
+hamburger.addEventListener('click', toggleMobileMenu);
+
+// Overlay click event
+navOverlay.addEventListener('click', closeMobileMenu);
 
 // Close mobile menu when clicking on a link
 document.querySelectorAll('.nav-menu a').forEach(link => {
-    link.addEventListener('click', () => {
-        hamburger.classList.remove('active');
-        navMenu.classList.remove('active');
-    });
+    link.addEventListener('click', closeMobileMenu);
+});
+
+// Close mobile menu on escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+        closeMobileMenu();
+    }
 });
 
 // Smooth scrolling for navigation links
@@ -425,21 +451,69 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
 // Contact Form Handling
 const contactForm = document.getElementById('contactForm');
-contactForm.addEventListener('submit', (e) => {
+contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const formData = new FormData(contactForm);
     const messageData = {
         name: formData.get('name'),
         email: formData.get('email'),
+        phone: formData.get('phone'),
         subject: formData.get('subject'),
         message: formData.get('message'),
         timestamp: new Date().toISOString()
     };
     
-    console.log('Contact form submitted:', messageData);
-    showNotification('Message sent successfully! We\'ll get back to you soon.', 'success');
-    contactForm.reset();
+    // Show loading state
+    const submitBtn = contactForm.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+    submitBtn.disabled = true;
+    
+    try {
+        // Try to send via custom function first
+        const response = await fetch('/.netlify/functions/send-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(messageData)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            showNotification('Message sent successfully! We\'ll get back to you soon.', 'success');
+            contactForm.reset();
+        } else {
+            throw new Error(result.error || 'Failed to send message');
+        }
+        
+    } catch (error) {
+        console.error('Error sending message:', error);
+        
+        // Fallback: Let Netlify handle the form submission
+        try {
+            // Submit the form normally (Netlify will handle it)
+            const netlifyForm = new FormData(contactForm);
+            await fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(netlifyForm).toString()
+            });
+            
+            showNotification('Message sent successfully! We\'ll get back to you soon.', 'success');
+            contactForm.reset();
+            
+        } catch (netlifyError) {
+            console.error('Netlify form error:', netlifyError);
+            showNotification('Failed to send message. Please try again or call us directly.', 'error');
+        }
+    } finally {
+        // Reset button state
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
 });
 
 // Checkout Form Handling
