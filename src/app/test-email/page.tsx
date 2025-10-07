@@ -21,7 +21,7 @@ export default function TestEmailPage() {
 
       const data = await response.json();
       setResult(data);
-    } catch (error) {
+    } catch {
       setResult({ error: 'Failed to test email' });
     } finally {
       setLoading(false);
@@ -58,14 +58,6 @@ export default function TestEmailPage() {
                 {result.success ? '✅ Success!' : '❌ Error'}
               </h3>
               <p className="text-sm">{result.message || result.error}</p>
-              {result.details && (
-                <details className="mt-2">
-                  <summary className="cursor-pointer text-sm">Details</summary>
-                  <pre className="text-xs mt-2 overflow-auto">
-                    {JSON.stringify(result.details, null, 2)}
-                  </pre>
-                </details>
-              )}
             </div>
           )}
           
