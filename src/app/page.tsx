@@ -72,6 +72,14 @@ export default function Home() {
     instructions: ''
   });
 
+  const [formErrors, setFormErrors] = useState({
+    firstName: false,
+    lastName: false,
+    email: false,
+    phone: false,
+    address: false
+  });
+
   const addToCart = (item: MenuItem) => {
     setCart(prev => {
       const existing = prev.find(cartItem => cartItem.id === item.id);
@@ -126,6 +134,44 @@ export default function Home() {
   };
 
   const processPayment = async () => {
+    // Reset errors
+    setFormErrors({
+      firstName: false,
+      lastName: false,
+      email: false,
+      phone: false,
+      address: false
+    });
+
+    // Validate customer information
+    const errors = {
+      firstName: !customerInfo.firstName.trim(),
+      lastName: !customerInfo.lastName.trim(),
+      email: !customerInfo.email.trim(),
+      phone: !customerInfo.phone.trim(),
+      address: !customerInfo.address.trim()
+    };
+
+    // Email validation regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (customerInfo.email.trim() && !emailRegex.test(customerInfo.email)) {
+      errors.email = true;
+    }
+
+    // Check if any errors
+    if (Object.values(errors).some(error => error)) {
+      setFormErrors(errors);
+      
+      // Show specific error message
+      if (errors.firstName) alert('Please enter your first name');
+      else if (errors.lastName) alert('Please enter your last name');
+      else if (errors.email) alert('Please enter a valid email address');
+      else if (errors.phone) alert('Please enter your phone number');
+      else if (errors.address) alert('Please enter your delivery address');
+      
+      return;
+    }
+    
     const { subtotal, tax, total } = getTotalPrice();
     
     try {
@@ -435,7 +481,7 @@ export default function Home() {
                       placeholder="First Name"
                       value={customerInfo.firstName}
                       onChange={(e) => setCustomerInfo(prev => ({ ...prev, firstName: e.target.value }))}
-                      className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${formErrors.firstName ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
                       required
                     />
                     <input
@@ -443,7 +489,7 @@ export default function Home() {
                       placeholder="Last Name"
                       value={customerInfo.lastName}
                       onChange={(e) => setCustomerInfo(prev => ({ ...prev, lastName: e.target.value }))}
-                      className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${formErrors.lastName ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
                       required
                     />
                   </div>
@@ -452,7 +498,7 @@ export default function Home() {
                     placeholder="Email"
                     value={customerInfo.email}
                     onChange={(e) => setCustomerInfo(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${formErrors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
                     required
                   />
                   <input
@@ -460,14 +506,14 @@ export default function Home() {
                     placeholder="Phone"
                     value={customerInfo.phone}
                     onChange={(e) => setCustomerInfo(prev => ({ ...prev, phone: e.target.value }))}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${formErrors.phone ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
                     required
                   />
                   <textarea
                     placeholder="Delivery Address"
                     value={customerInfo.address}
                     onChange={(e) => setCustomerInfo(prev => ({ ...prev, address: e.target.value }))}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${formErrors.address ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
                     rows={3}
                     required
                   />
