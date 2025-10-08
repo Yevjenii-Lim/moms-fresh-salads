@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
 import { config } from '../../../config/keys';
+import { addWebhookLog } from '../webhook-logs/route';
 
 interface OrderData {
   sessionId: string;
@@ -122,6 +123,9 @@ export async function POST(request: NextRequest) {
     console.log('🎣 Webhook received at:', new Date().toISOString());
     console.log('🔧 Webhook secret status:', config.stripe.webhookSecret ? 'present' : 'missing');
     
+    addWebhookLog('🎣 Webhook received');
+    addWebhookLog(`🔧 Webhook secret: ${config.stripe.webhookSecret ? 'present' : 'missing'}`);
+    
     const body = await request.text();
     const signature = request.headers.get('stripe-signature');
 
@@ -154,11 +158,16 @@ export async function POST(request: NextRequest) {
         webhookSecretPresent: !!config.stripe.webhookSecret,
         webhookSecretPreview: config.stripe.webhookSecret ? config.stripe.webhookSecret.substring(0, 8) + '...' : 'missing'
       });
+      
+      addWebhookLog(`❌ Signature verification failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
     console.log('✅ Webhook signature verified');
     console.log('📊 Event type:', event.type);
+    
+    addWebhookLog('✅ Signature verified successfully');
+    addWebhookLog(`📊 Event type: ${event.type}`);
 
     if (event.type === 'checkout.session.completed') {
       console.log('🎯 Processing checkout.session.completed');
@@ -194,6 +203,7 @@ export async function POST(request: NextRequest) {
         console.error('❌ Email sending failed:', emailError);
         // Don't fail the webhook if email fails
         console.log('⚠️ Continuing despite email failure');
+        addWebhookLog(`❌ Email sending failed: ${emailError instanceof Error ? emailError.message : 'Unknown error'}`);
       }
       
       return NextResponse.json({ received: true });
