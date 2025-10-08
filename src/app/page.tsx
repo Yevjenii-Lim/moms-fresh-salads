@@ -462,11 +462,11 @@ export default function Home() {
 
       {/* Checkout Modal */}
       {showCheckout && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setShowCheckout(false)} />
-          <div className="absolute inset-0 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
+          <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md my-8">
+            <div className="max-h-[85vh] overflow-y-auto">
+              <div className="p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-xl font-semibold">Checkout</h3>
                   <button onClick={() => setShowCheckout(false)}>
@@ -474,14 +474,14 @@ export default function Home() {
                   </button>
                 </div>
                 
-                <form className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                <form className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <input
                       type="text"
                       placeholder="First Name"
                       value={customerInfo.firstName}
                       onChange={(e) => setCustomerInfo(prev => ({ ...prev, firstName: e.target.value }))}
-                      className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${formErrors.firstName ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
+                      className={`px-3 py-2.5 text-base border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${formErrors.firstName ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
                       required
                     />
                     <input
@@ -489,7 +489,7 @@ export default function Home() {
                       placeholder="Last Name"
                       value={customerInfo.lastName}
                       onChange={(e) => setCustomerInfo(prev => ({ ...prev, lastName: e.target.value }))}
-                      className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${formErrors.lastName ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
+                      className={`px-3 py-2.5 text-base border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${formErrors.lastName ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
                       required
                     />
                   </div>
@@ -498,7 +498,7 @@ export default function Home() {
                     placeholder="Email"
                     value={customerInfo.email}
                     onChange={(e) => setCustomerInfo(prev => ({ ...prev, email: e.target.value }))}
-                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${formErrors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
+                    className={`w-full px-3 py-2.5 text-base border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${formErrors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
                     required
                   />
                   <input
@@ -506,22 +506,22 @@ export default function Home() {
                     placeholder="Phone"
                     value={customerInfo.phone}
                     onChange={(e) => setCustomerInfo(prev => ({ ...prev, phone: e.target.value }))}
-                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${formErrors.phone ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
+                    className={`w-full px-3 py-2.5 text-base border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${formErrors.phone ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
                     required
                   />
                   <textarea
                     placeholder="Delivery Address"
                     value={customerInfo.address}
                     onChange={(e) => setCustomerInfo(prev => ({ ...prev, address: e.target.value }))}
-                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${formErrors.address ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
-                    rows={3}
+                    className={`w-full px-3 py-2.5 text-base border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${formErrors.address ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
+                    rows={2}
                     required
                   />
                   <textarea
                     placeholder="Special Instructions (optional)"
                     value={customerInfo.instructions}
                     onChange={(e) => setCustomerInfo(prev => ({ ...prev, instructions: e.target.value }))}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2.5 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     rows={2}
                   />
                   
@@ -544,7 +544,7 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={processPayment}
-                      className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
+                      className="w-full bg-green-600 text-white py-3.5 text-base rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2 font-semibold"
                     >
                       <span>💳</span>
                       <span>Pay ${getTotalPrice().total.toFixed(2)}</span>
