@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
 import { config } from '../../../config/keys';
 import { addWebhookLog } from '../webhook-logs/route';
-import aws from '@aws-sdk/client-ses';
+import { SES } from '@aws-sdk/client-ses';
 import { defaultProvider } from '@aws-sdk/credential-provider-node';
 
 interface OrderData {
@@ -43,14 +43,14 @@ async function sendOrderConfirmationEmail(orderData: OrderData) {
   addWebhookLog('📧 Creating SES email transporter...');
   
   // Use AWS SES instead of Gmail
-  const ses = new aws.SES({
+  const ses = new SES({
     apiVersion: '2010-12-01',
     region: process.env.AWS_REGION || 'us-east-1',
     credentials: defaultProvider(),
   });
   
   const transporter = nodemailer.createTransport({
-    SES: { ses, aws },
+    SES: { ses, aws: { SES } },
   });
   
   console.log('📧 SES email transporter created successfully');
