@@ -3,8 +3,6 @@ import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
 import { config } from '../../../config/keys';
 import { addWebhookLog } from '../webhook-logs/route';
-import { SES } from '@aws-sdk/client-ses';
-import { defaultProvider } from '@aws-sdk/credential-provider-node';
 
 interface OrderData {
   sessionId: string;
@@ -37,23 +35,24 @@ const stripe = new Stripe(config.stripe.secretKey, {
   httpClient: Stripe.createFetchHttpClient(),
 });
 
-// Email sending function using AWS SES
+// Email sending function using AWS SES SMTP
 async function sendOrderConfirmationEmail(orderData: OrderData) {
-  console.log('📧 Creating SES email transporter...');
-  addWebhookLog('📧 Creating SES email transporter...');
+  console.log('📧 Creating SES SMTP email transporter...');
+  addWebhookLog('📧 Creating SES SMTP email transporter...');
   
-  // Use AWS SES instead of Gmail
-  const ses = new SES({
-    region: process.env.AWS_REGION || 'us-east-1',
-    credentials: defaultProvider(),
+  // Use AWS SES SMTP (simpler and more reliable than SDK)
+  const transporter = nodemailer.createTransport({
+    host: 'email-smtp.us-east-1.amazonaws.com',
+    port: 587,
+    secure: false, // Use TLS
+    auth: {
+      user: process.env.AWS_SES_SMTP_USER || config.email.user,
+      pass: process.env.AWS_SES_SMTP_PASSWORD || config.email.password,
+    },
   });
   
-  const transporter = nodemailer.createTransport({
-    SES: { ses, aws: require('@aws-sdk/client-ses') },
-  } as any);
-  
-  console.log('📧 SES email transporter created successfully');
-  addWebhookLog('📧 SES email transporter created successfully');
+  console.log('📧 SES SMTP email transporter created successfully');
+  addWebhookLog('📧 SES SMTP email transporter created successfully');
 
   // Customer email
   const customerEmailHtml = `
