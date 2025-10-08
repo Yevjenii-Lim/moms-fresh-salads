@@ -119,10 +119,18 @@ async function sendOrderConfirmationEmail(orderData: OrderData) {
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🎣 Webhook received');
+    console.log('🎣 Webhook received at:', new Date().toISOString());
+    console.log('🔧 Webhook secret status:', config.stripe.webhookSecret ? 'present' : 'missing');
     
     const body = await request.text();
     const signature = request.headers.get('stripe-signature');
+
+    console.log('📋 Request details:', {
+      hasBody: !!body,
+      bodyLength: body.length,
+      hasSignature: !!signature,
+      signaturePreview: signature ? signature.substring(0, 20) + '...' : 'none'
+    });
 
     if (!signature) {
       console.log('❌ No signature found');
@@ -132,13 +140,20 @@ export async function POST(request: NextRequest) {
     let event: Stripe.Event;
 
     try {
+      console.log('🔐 Verifying webhook signature...');
       event = stripe.webhooks.constructEvent(
         body,
         signature,
         config.stripe.webhookSecret
       );
+      console.log('✅ Webhook signature verified successfully');
     } catch (err) {
       console.log('❌ Webhook signature verification failed:', err);
+      console.log('❌ Error details:', {
+        message: err instanceof Error ? err.message : 'Unknown error',
+        webhookSecretPresent: !!config.stripe.webhookSecret,
+        webhookSecretPreview: config.stripe.webhookSecret ? config.stripe.webhookSecret.substring(0, 8) + '...' : 'missing'
+      });
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
@@ -172,9 +187,14 @@ export async function POST(request: NextRequest) {
 
       // Send confirmation emails
       console.log('📧 Sending confirmation emails...');
-      await sendOrderConfirmationEmail(orderData);
-      
-      console.log('🎉 Order processed successfully - emails sent!');
+      try {
+        await sendOrderConfirmationEmail(orderData);
+        console.log('🎉 Order processed successfully - emails sent!');
+      } catch (emailError) {
+        console.error('❌ Email sending failed:', emailError);
+        // Don't fail the webhook if email fails
+        console.log('⚠️ Continuing despite email failure');
+      }
       
       return NextResponse.json({ received: true });
     }
@@ -214,9 +234,14 @@ export async function POST(request: NextRequest) {
 
       // Send confirmation emails
       console.log('📧 Sending confirmation emails for charge...');
-      await sendOrderConfirmationEmail(orderData);
-      
-      console.log('🎉 Charge processed successfully - emails sent!');
+      try {
+        await sendOrderConfirmationEmail(orderData);
+        console.log('🎉 Charge processed successfully - emails sent!');
+      } catch (emailError) {
+        console.error('❌ Email sending failed for charge:', emailError);
+        // Don't fail the webhook if email fails
+        console.log('⚠️ Continuing despite email failure');
+      }
       
       return NextResponse.json({ received: true });
     }

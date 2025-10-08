@@ -101,11 +101,6 @@ export async function POST(request: NextRequest) {
         total: total.toFixed(2),
         itemCount: items.reduce((sum: number, item: CartItem) => sum + item.quantity, 0)
       },
-      payment_intent_data: {
-        metadata: {
-          sessionId: 'placeholder' // Will be replaced with actual session ID
-        }
-      },
       phone_number_collection: {
         enabled: true,
       },
