@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { config } from '../../../config/keys';
 
-// Initialize Stripe with configuration and timeout settings
+// Initialize Stripe with configuration and custom HTTP settings
 const stripe = new Stripe(config.stripe.secretKey, {
   apiVersion: '2025-09-30.clover',
   timeout: 30000, // 30 second timeout
   maxNetworkRetries: 3,
+  httpClient: Stripe.createFetchHttpClient(),
 });
 
 export async function POST(request: NextRequest) {
