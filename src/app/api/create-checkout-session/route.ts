@@ -1,19 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-// Use environment variables directly with fallbacks for development
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder_key';
-const GMAIL_USER = process.env.GMAIL_USER || 'yevhenii.lim27@gmail.com';
-const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD || 'placeholder_password';
+// Check if we have valid environment variables
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+const GMAIL_USER = process.env.GMAIL_USER;
+const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
 
-const stripe = new Stripe(STRIPE_SECRET_KEY, {
-  apiVersion: '2025-09-30.clover',
-});
+// Only initialize Stripe if we have a valid key
+let stripe: Stripe | null = null;
+if (STRIPE_SECRET_KEY && STRIPE_SECRET_KEY.startsWith('sk_')) {
+  stripe = new Stripe(STRIPE_SECRET_KEY, {
+    apiVersion: '2025-09-30.clover',
+  });
+}
 
 console.log('Environment check:', {
   stripeKey: STRIPE_SECRET_KEY ? 'present' : 'missing',
   gmailUser: GMAIL_USER ? 'present' : 'missing',
-  gmailPassword: GMAIL_APP_PASSWORD ? 'present' : 'missing'
+  gmailPassword: GMAIL_APP_PASSWORD ? 'present' : 'missing',
+  stripeInitialized: stripe ? 'yes' : 'no'
 });
 
 interface CartItem {
@@ -37,6 +42,18 @@ interface CustomerInfo {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if Stripe is properly initialized
+    if (!stripe) {
+      console.error('Stripe not initialized - missing or invalid STRIPE_SECRET_KEY');
+      return NextResponse.json(
+        { 
+          error: 'Payment service not configured. Please contact support.',
+          details: 'Missing Stripe configuration'
+        },
+        { status: 503 }
+      );
+    }
+
     const { items, customerInfo, subtotal, tax, total }: {
       items: CartItem[];
       customerInfo: CustomerInfo;
