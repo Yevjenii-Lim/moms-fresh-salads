@@ -21,7 +21,7 @@ interface CartItem {
   name: string;
   description: string;
   price: number;
-  image: string;
+  image?: string;
   category: string;
   quantity: number;
 }
@@ -53,7 +53,15 @@ export async function POST(request: NextRequest) {
       total: number;
     } = await request.json();
 
+    console.log('📦 Request data received:', {
+      itemsCount: items.length,
+      items: items.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity })),
+      customerEmail: customerInfo.email,
+      total: total
+    });
+
     // Create Stripe checkout session
+    console.log('🎯 Creating Stripe checkout session...');
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: items.map((item: CartItem) => ({
