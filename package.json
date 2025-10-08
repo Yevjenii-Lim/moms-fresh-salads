@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@aws-sdk/client-ssm": "^3.901.0",
     "@stripe/stripe-js": "^8.0.0",
     "@types/nodemailer": "^7.0.2",
     "lucide-react": "^0.545.0",
