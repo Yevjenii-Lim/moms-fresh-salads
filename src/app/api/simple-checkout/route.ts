@@ -29,8 +29,8 @@ export async function POST(request: NextRequest) {
         quantity: 1
       }],
       mode: 'payment',
-      success_url: `${request.nextUrl.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${request.nextUrl.origin}/cancel`
+      success_url: `https://eurasianbowl.com/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `https://eurasianbowl.com/cancel`
     });
 
     console.log('✅ Simple checkout session created:', session.id);
