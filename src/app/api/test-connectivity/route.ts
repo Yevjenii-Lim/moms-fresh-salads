@@ -8,8 +8,7 @@ export async function GET() {
     let httpTest;
     try {
       const response = await fetch('https://httpbin.org/get', {
-        method: 'GET',
-        timeout: 10000
+        method: 'GET'
       });
       httpTest = response.ok ? 'success' : `failed: ${response.status}`;
       console.log('✅ Basic HTTP request successful');
@@ -25,8 +24,7 @@ export async function GET() {
         method: 'GET',
         headers: {
           'Authorization': 'Bearer ' + 'sk_test_invalid_key_for_testing',
-        },
-        timeout: 10000
+        }
       });
       // We expect a 401 (unauthorized) but that means we can reach Stripe
       stripeDirectTest = response.status === 401 ? 'reachable' : `unexpected: ${response.status}`;
@@ -40,8 +38,7 @@ export async function GET() {
     let dnsTest;
     try {
       const response = await fetch('https://api.stripe.com', {
-        method: 'HEAD',
-        timeout: 5000
+        method: 'HEAD'
       });
       dnsTest = 'resolved';
       console.log('✅ DNS resolution successful');
