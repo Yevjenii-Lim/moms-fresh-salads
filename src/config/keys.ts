@@ -28,7 +28,7 @@ export const config = {
 };
 
 // Log configuration status (for debugging)
-console.log('🔧 Configuration loaded - version 2.0.2:', {
+console.log('🔧 Configuration loaded - version 2.0.3-gmail-fix:', {
   stripeKey: config.stripe.secretKey ? 'present' : 'missing',
   stripeKeyPreview: config.stripe.secretKey ? config.stripe.secretKey.substring(0, 8) + '...' : 'missing',
   stripeWebhookSecret: config.stripe.webhookSecret ? 'present' : 'missing',
