@@ -38,6 +38,107 @@ interface CustomerInfo {
   instructions?: string;
 }
 
+// Email sending function
+async function sendOrderConfirmationEmail(orderData: {
+  sessionId: string;
+  customerInfo: {
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+    instructions: string;
+  };
+  items: CartItem[];
+  total: number;
+  subtotal: number;
+  tax: number;
+}) {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: config.email.user,
+        pass: config.email.password,
+      },
+    });
+
+    // Customer email
+    const customerEmailHtml = `
+      <h2>Thank you for your order!</h2>
+      <p>Hi ${orderData.customerInfo.name},</p>
+      <p>We've received your order and are preparing it for you.</p>
+      
+      <h3>Order Details:</h3>
+      <p><strong>Order ID:</strong> ${orderData.sessionId}</p>
+      
+      <h3>Items:</h3>
+      ${orderData.items.map(item => `
+        <div style="border: 1px solid #ddd; padding: 10px; margin: 5px 0;">
+          <strong>${item.name}</strong><br>
+          Quantity: ${item.quantity}<br>
+          Price: $${item.price.toFixed(2)} each
+        </div>
+      `).join('')}
+      
+      <p><strong>Subtotal:</strong> $${orderData.subtotal.toFixed(2)}</p>
+      <p><strong>Tax:</strong> $${orderData.tax.toFixed(2)}</p>
+      <p><strong>Total:</strong> $${orderData.total.toFixed(2)}</p>
+      
+      <p>We'll send you another email when your order is ready for pickup!</p>
+      <p>Thank you for choosing Mom&apos;s Fresh Salads!</p>
+    `;
+
+    // Business email
+    const businessEmailHtml = `
+      <h2>New Order Received</h2>
+      <p><strong>Order ID:</strong> ${orderData.sessionId}</p>
+      
+      <h3>Customer Information:</h3>
+      <p><strong>Name:</strong> ${orderData.customerInfo.name}</p>
+      <p><strong>Email:</strong> ${orderData.customerInfo.email}</p>
+      <p><strong>Phone:</strong> ${orderData.customerInfo.phone}</p>
+      <p><strong>Address:</strong> ${orderData.customerInfo.address}</p>
+      ${orderData.customerInfo.instructions ? `<p><strong>Special Instructions:</strong> ${orderData.customerInfo.instructions}</p>` : ''}
+      
+      <h3>Order Items:</h3>
+      ${orderData.items.map(item => `
+        <div style="border: 1px solid #ddd; padding: 10px; margin: 5px 0;">
+          <strong>${item.name}</strong><br>
+          Quantity: ${item.quantity}<br>
+          Price: $${item.price.toFixed(2)} each
+        </div>
+      `).join('')}
+      
+      <p><strong>Subtotal:</strong> $${orderData.subtotal.toFixed(2)}</p>
+      <p><strong>Tax:</strong> $${orderData.tax.toFixed(2)}</p>
+      <p><strong>Total:</strong> $${orderData.total.toFixed(2)}</p>
+    `;
+
+    // Send customer email
+    await transporter.sendMail({
+      from: config.email.user,
+      to: orderData.customerInfo.email,
+      subject: `Order Confirmation - ${orderData.sessionId}`,
+      html: customerEmailHtml,
+    });
+
+    // Send business email
+    await transporter.sendMail({
+      from: config.email.user,
+      to: config.email.user, // Send to business email
+      subject: `New Order - ${orderData.sessionId}`,
+      html: businessEmailHtml,
+    });
+
+    console.log('Order confirmation email sent to:', orderData.customerInfo.email);
+    console.log('Business notification email sent');
+
+  } catch (error) {
+    console.error('Failed to send order confirmation email:', error);
+    throw error;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     console.log('🚀 Create checkout session called - version 2.0.1');
@@ -120,15 +221,8 @@ export async function POST(request: NextRequest) {
       total: total.toFixed(2)
     });
 
-    // For local development: Send emails immediately
-    // In production: Emails will be sent via EventBridge after successful payment
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔧 Development mode: Emails will be sent via EventBridge after payment completion');
-      console.log('📧 To test emails locally, complete the EventBridge setup or use the test-email page');
-    } else {
-      console.log('✅ Checkout session created, emails will be sent via EventBridge after payment completion');
-      console.log('🚀 Deployment version: 2.0.1-fix-deployment-cache - ' + new Date().toISOString());
-    }
+    // Emails will be sent via webhook after payment completion
+    console.log('✅ Checkout session created - emails will be sent via webhook after payment');
 
     return NextResponse.json({ url: session.url });
   } catch (error) {

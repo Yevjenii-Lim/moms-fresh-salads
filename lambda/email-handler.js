@@ -5,14 +5,27 @@ const nodemailer = require('nodemailer');
 const ses = new AWS.SES({ region: 'us-east-1' });
 
 exports.handler = async (event) => {
-    console.log('Received EventBridge event:', JSON.stringify(event, null, 2));
+    console.log('🚀 Lambda function triggered at:', new Date().toISOString());
+    console.log('📋 Event received:', typeof event, event ? 'has data' : 'no data');
+    
+    if (!event) {
+        console.log('❌ No event received');
+        return { statusCode: 400, body: 'No event received' };
+    }
+    
+    console.log('📋 Received EventBridge event:', JSON.stringify(event, null, 2));
+    console.log('🔍 Event source:', event.source);
+    console.log('📊 Event detail type:', event['detail-type']);
     
     try {
         // Extract Stripe event data
         const stripeEvent = event.detail;
         
         if (stripeEvent.type === 'checkout.session.completed') {
+            console.log('✅ Processing checkout.session.completed event');
             const session = stripeEvent.data.object;
+            console.log('💰 Session ID:', session.id);
+            console.log('💰 Amount:', session.amount_total);
             
             // Extract order data from metadata
             const orderData = {
@@ -32,10 +45,12 @@ exports.handler = async (event) => {
             };
             
             // Send emails
+            console.log('📧 Sending confirmation emails...');
             await sendOrderConfirmationEmail(orderData);
             await sendBusinessNotificationEmail(orderData);
             
-            console.log('Order confirmation emails sent successfully');
+            console.log('🎉 Order confirmation emails sent successfully');
+            console.log('✅ Lambda execution completed at:', new Date().toISOString());
             
             return {
                 statusCode: 200,
