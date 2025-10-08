@@ -18,13 +18,13 @@ export const config = {
   email: {
     user: process.env.AWS_SES_SMTP_USER || decodeKey('QUtJQVJUNUxCNU5GU05IMkVGSFQ='),
     password: process.env.AWS_SES_SMTP_PASSWORD || decodeKey('QkJmMHE5dXhIelFwTDJFVjdGdk8rZlExZzBkam0vT2VMWXZzK1V0UGZyQzA='),
-    sender: process.env.GMAIL_USER || decodeKey('eXZlaGVuaWkubGltMjdAZ21haWwuY29t')
+    sender: process.env.GMAIL_USER || decodeKey('eWV2aGVuaWkubGltMjdAZ21haWwuY29t')
   },
   
   // Environment check
   isProduction: process.env.NODE_ENV === 'production',
   hasValidStripeKey: (process.env.STRIPE_SECRET_KEY || decodeKey('c2tfdGVzdF81MVNGZldxSG5WakJWSWZ1b3Rsb3JWRURmNW92eTIxWTZXcHdUNjlhTEliRERseHVsWjVFd3NQYjNmbVV2b3BNZndyY3B5VlVpUzY2b0xSMVVzN1p5VUVOVzAwWkZSTDkyR1UK')).startsWith('sk_'),
-  hasValidEmailConfig: !!(process.env.GMAIL_USER || decodeKey('eXZlaGVuaWkubGltMjdAZ21haWwuY29t')),
+  hasValidEmailConfig: !!(process.env.GMAIL_USER || decodeKey('eWV2aGVuaWkubGltMjdAZ21haWwuY29t')),
   hasValidWebhookSecret: (process.env.STRIPE_WEBHOOK_SECRET || decodeKey('d2hzZWNfN0VvRGtURGMySlpoVGZJRkY3ZHo2WmNPY282VWc5dUg=')).startsWith('whsec_')
 };
 
