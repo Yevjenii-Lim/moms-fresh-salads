@@ -179,6 +179,48 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ received: true });
     }
 
+    if (event.type === 'charge.succeeded') {
+      console.log('🎯 Processing charge.succeeded');
+      
+      const charge = event.data.object as Stripe.Charge;
+      console.log('💰 Charge ID:', charge.id);
+      console.log('💰 Amount:', charge.amount);
+      console.log('💰 Customer Email:', charge.billing_details.email);
+
+      // Create basic order data from charge information
+      const orderData = {
+        sessionId: charge.id, // Use charge ID as session ID
+        customerInfo: {
+          firstName: charge.billing_details.name?.split(' ')[0] || 'Customer',
+          lastName: charge.billing_details.name?.split(' ').slice(1).join(' ') || '',
+          email: charge.billing_details.email || '',
+          phone: charge.billing_details.phone || '',
+          address: charge.billing_details.address ? 
+            `${charge.billing_details.address.line1 || ''} ${charge.billing_details.address.city || ''} ${charge.billing_details.address.state || ''} ${charge.billing_details.address.postal_code || ''}`.trim() : '',
+          instructions: ''
+        },
+        items: [{
+          id: '1',
+          name: 'Salad Order',
+          description: 'Fresh salad order',
+          price: (charge.amount / 100),
+          quantity: 1
+        }],
+        subtotal: (charge.amount / 100).toFixed(2),
+        tax: '0.00',
+        total: (charge.amount / 100).toFixed(2),
+        amountTotal: (charge.amount / 100).toFixed(2)
+      };
+
+      // Send confirmation emails
+      console.log('📧 Sending confirmation emails for charge...');
+      await sendOrderConfirmationEmail(orderData);
+      
+      console.log('🎉 Charge processed successfully - emails sent!');
+      
+      return NextResponse.json({ received: true });
+    }
+
     console.log('ℹ️ Event type not handled:', event.type);
     return NextResponse.json({ received: true });
 
