@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import Stripe from 'stripe';
 import { config } from '../../../config/keys';
 
 export async function GET() {
@@ -16,21 +17,13 @@ export async function GET() {
     
     console.log('🔧 Configuration status:', configStatus);
     
-    // Test 2: Try importing Stripe
-    let stripeImport;
-    try {
-      const Stripe = require('stripe');
-      stripeImport = 'success';
-      console.log('✅ Stripe import successful');
-    } catch (error) {
-      console.error('❌ Stripe import failed:', error);
-      stripeImport = 'failed';
-    }
+    // Test 2: Try importing Stripe (already imported at top)
+    const stripeImport = 'success';
+    console.log('✅ Stripe import successful');
     
     // Test 3: Try initializing Stripe
     let stripeInit;
     try {
-      const Stripe = require('stripe');
       const stripe = new Stripe(config.stripe.secretKey, {
         apiVersion: '2025-09-30.clover',
       });
@@ -38,7 +31,6 @@ export async function GET() {
       console.log('✅ Stripe initialization successful');
     } catch (error) {
       console.error('❌ Stripe initialization failed:', error);
-      stripeInit = 'failed';
       stripeInit = error instanceof Error ? error.message : 'Unknown error';
     }
     
