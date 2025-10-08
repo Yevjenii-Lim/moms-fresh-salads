@@ -4,7 +4,7 @@ import { config } from '../../../config/keys';
 
 // Initialize Stripe with configuration
 const stripe = new Stripe(config.stripe.secretKey, {
-  apiVersion: '2024-06-20',
+  apiVersion: '2025-09-30.clover',
 });
 
 export async function POST(request: NextRequest) {
