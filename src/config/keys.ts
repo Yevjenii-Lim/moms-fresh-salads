@@ -16,8 +16,9 @@ export const config = {
   
   // Email configuration
   email: {
-    user: process.env.GMAIL_USER || decodeKey('eXZlaGVuaWkubGltMjdAZ21haWwuY29t'),
-    password: process.env.GMAIL_APP_PASSWORD || decodeKey('b3Nnb2ZqdGxzeWh1ZnRrZA==')
+    user: process.env.AWS_SES_SMTP_USER || decodeKey('QUtJQVJUNUxCNU5GU05IMkVGSFQ='),
+    password: process.env.AWS_SES_SMTP_PASSWORD || decodeKey('QkJmMHE5dXhIelFwTDJFVjdGdk8rZlExZzBkam0vT2VMWXZzK1V0UGZyQzA='),
+    sender: process.env.GMAIL_USER || decodeKey('eXZlaGVuaWkubGltMjdAZ21haWwuY29t')
   },
   
   // Environment check

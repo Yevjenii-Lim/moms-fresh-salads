@@ -109,7 +109,7 @@ async function sendOrderConfirmationEmail(orderData: OrderData) {
     
     // Send customer confirmation
     await transporter.sendMail({
-      from: `Mom's Fresh Salads <${config.email.user}>`,
+      from: `Mom's Fresh Salads <${config.email.sender}>`,
       to: orderData.customerInfo.email,
       subject: 'Order Confirmation - Mom\'s Fresh Salads',
       html: customerEmailHtml,
@@ -123,8 +123,8 @@ async function sendOrderConfirmationEmail(orderData: OrderData) {
 
     // Send business notification
     await transporter.sendMail({
-      from: `Mom's Fresh Salads <${config.email.user}>`,
-      to: config.email.user, // Send to business email
+      from: `Mom's Fresh Salads <${config.email.sender}>`,
+      to: config.email.sender, // Send to business email
       subject: `New Order - ${orderData.customerInfo.firstName} ${orderData.customerInfo.lastName}`,
       html: businessEmailHtml,
     });
