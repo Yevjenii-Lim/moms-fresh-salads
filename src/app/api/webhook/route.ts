@@ -3,6 +3,8 @@ import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
 import { config } from '../../../config/keys';
 import { addWebhookLog } from '../webhook-logs/route';
+import aws from '@aws-sdk/client-ses';
+import { defaultProvider } from '@aws-sdk/credential-provider-node';
 
 interface OrderData {
   sessionId: string;
@@ -35,21 +37,24 @@ const stripe = new Stripe(config.stripe.secretKey, {
   httpClient: Stripe.createFetchHttpClient(),
 });
 
-// Email sending function
+// Email sending function using AWS SES
 async function sendOrderConfirmationEmail(orderData: OrderData) {
-  console.log('📧 Creating email transporter...');
-  addWebhookLog('📧 Creating email transporter...');
+  console.log('📧 Creating SES email transporter...');
+  addWebhookLog('📧 Creating SES email transporter...');
   
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: config.email.user,
-      pass: config.email.password,
-    },
+  // Use AWS SES instead of Gmail
+  const ses = new aws.SES({
+    apiVersion: '2010-12-01',
+    region: process.env.AWS_REGION || 'us-east-1',
+    credentials: defaultProvider(),
   });
   
-  console.log('📧 Email transporter created successfully');
-  addWebhookLog('📧 Email transporter created successfully');
+  const transporter = nodemailer.createTransport({
+    SES: { ses, aws },
+  });
+  
+  console.log('📧 SES email transporter created successfully');
+  addWebhookLog('📧 SES email transporter created successfully');
 
   // Customer email
   const customerEmailHtml = `
@@ -106,7 +111,7 @@ async function sendOrderConfirmationEmail(orderData: OrderData) {
     
     // Send customer confirmation
     await transporter.sendMail({
-      from: config.email.user,
+      from: `Mom's Fresh Salads <${config.email.user}>`,
       to: orderData.customerInfo.email,
       subject: 'Order Confirmation - Mom\'s Fresh Salads',
       html: customerEmailHtml,
@@ -120,7 +125,7 @@ async function sendOrderConfirmationEmail(orderData: OrderData) {
 
     // Send business notification
     await transporter.sendMail({
-      from: config.email.user,
+      from: `Mom's Fresh Salads <${config.email.user}>`,
       to: config.email.user, // Send to business email
       subject: `New Order - ${orderData.customerInfo.firstName} ${orderData.customerInfo.lastName}`,
       html: businessEmailHtml,
