@@ -12,7 +12,8 @@ export async function GET() {
       stripePublishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ? 'present' : 'missing',
       // Debug info (first few characters only for security)
       stripeKeyPreview: process.env.STRIPE_SECRET_KEY ? process.env.STRIPE_SECRET_KEY.substring(0, 10) + '...' : 'not found',
-      version: '1.0.0'
+      version: '1.0.1',
+      deploymentTrigger: 'env-vars-fix'
     };
 
     return NextResponse.json(healthCheck);
