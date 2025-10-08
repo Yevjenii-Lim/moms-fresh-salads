@@ -21,33 +21,33 @@ export async function GET() {
     const stripeImport = 'success';
     console.log('✅ Stripe import successful');
     
-    // Test 3: Try initializing Stripe
-    let stripeInit;
-    try {
-      const stripe = new Stripe(config.stripe.secretKey, {
-        apiVersion: '2025-09-30.clover',
-      });
-      stripeInit = 'success';
-      console.log('✅ Stripe initialization successful');
-    } catch (error) {
-      console.error('❌ Stripe initialization failed:', error);
-      stripeInit = error instanceof Error ? error.message : 'Unknown error';
-    }
+           // Test 3: Try initializing Stripe
+           let stripeInit;
+           try {
+             new Stripe(config.stripe.secretKey, {
+               apiVersion: '2025-09-30.clover',
+             });
+             stripeInit = 'success';
+             console.log('✅ Stripe initialization successful');
+           } catch (error) {
+             console.error('❌ Stripe initialization failed:', error);
+             stripeInit = error instanceof Error ? error.message : 'Unknown error';
+           }
     
-    // Test 4: Try a simple Stripe API call
-    let stripeApiTest;
-    try {
-      const stripe = new Stripe(config.stripe.secretKey, {
-        apiVersion: '2025-09-30.clover',
-      });
-      // Try to retrieve account info (lightweight API call)
-      const account = await stripe.accounts.retrieve();
-      stripeApiTest = 'success';
-      console.log('✅ Stripe API call successful');
-    } catch (error) {
-      console.error('❌ Stripe API call failed:', error);
-      stripeApiTest = error instanceof Error ? error.message : 'Unknown error';
-    }
+           // Test 4: Try a simple Stripe API call
+           let stripeApiTest;
+           try {
+             const stripe = new Stripe(config.stripe.secretKey, {
+               apiVersion: '2025-09-30.clover',
+             });
+             // Try to retrieve account info (lightweight API call)
+             await stripe.accounts.retrieve();
+             stripeApiTest = 'success';
+             console.log('✅ Stripe API call successful');
+           } catch (error) {
+             console.error('❌ Stripe API call failed:', error);
+             stripeApiTest = error instanceof Error ? error.message : 'Unknown error';
+           }
     
     return NextResponse.json({
       status: 'test-complete',

@@ -3,6 +3,29 @@ import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
 import { config } from '../../../config/keys';
 
+interface OrderData {
+  sessionId: string;
+  customerInfo: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    address: string;
+    instructions: string;
+  };
+  items: Array<{
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    quantity: number;
+  }>;
+  subtotal: string;
+  tax: string;
+  total: string;
+  amountTotal: string;
+}
+
 // Initialize Stripe with configuration and custom HTTP settings
 const stripe = new Stripe(config.stripe.secretKey, {
   apiVersion: '2025-09-30.clover',
@@ -12,7 +35,7 @@ const stripe = new Stripe(config.stripe.secretKey, {
 });
 
 // Email sending function
-async function sendOrderConfirmationEmail(orderData: any) {
+async function sendOrderConfirmationEmail(orderData: OrderData) {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -34,9 +57,9 @@ async function sendOrderConfirmationEmail(orderData: any) {
       
       <h3>Items:</h3>
       <ul>
-        ${orderData.items.map((item: any) => 
-          `<li>${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}</li>`
-        ).join('')}
+      ${orderData.items.map((item) => 
+        `<li>${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}</li>`
+      ).join('')}
       </ul>
       
       <p>Thank you for choosing Mom's Fresh Salads!</p>
@@ -63,9 +86,9 @@ async function sendOrderConfirmationEmail(orderData: any) {
       
       <h3>Items:</h3>
       <ul>
-        ${orderData.items.map((item: any) => 
-          `<li>${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}</li>`
-        ).join('')}
+      ${orderData.items.map((item) => 
+        `<li>${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}</li>`
+      ).join('')}
       </ul>
     </div>
   `;

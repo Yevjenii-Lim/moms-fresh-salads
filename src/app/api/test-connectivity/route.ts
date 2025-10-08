@@ -35,17 +35,17 @@ export async function GET() {
     }
     
     // Test 3: Try DNS resolution
-    let dnsTest;
-    try {
-      const response = await fetch('https://api.stripe.com', {
-        method: 'HEAD'
-      });
-      dnsTest = 'resolved';
-      console.log('✅ DNS resolution successful');
-    } catch (error) {
-      dnsTest = error instanceof Error ? error.message : 'Unknown error';
-      console.error('❌ DNS resolution failed:', error);
-    }
+           let dnsTest;
+           try {
+             await fetch('https://api.stripe.com', {
+               method: 'HEAD'
+             });
+             dnsTest = 'resolved';
+             console.log('✅ DNS resolution successful');
+           } catch (error) {
+             dnsTest = error instanceof Error ? error.message : 'Unknown error';
+             console.error('❌ DNS resolution failed:', error);
+           }
     
     return NextResponse.json({
       status: 'connectivity-test-complete',

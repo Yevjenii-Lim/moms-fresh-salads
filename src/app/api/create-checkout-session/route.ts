@@ -38,8 +38,8 @@ interface CustomerInfo {
   instructions?: string;
 }
 
-// Email sending function
-async function sendOrderConfirmationEmail(orderData: {
+// Email sending function (moved to webhook)
+// async function sendOrderConfirmationEmail(orderData: {
   sessionId: string;
   customerInfo: {
     name: string;
