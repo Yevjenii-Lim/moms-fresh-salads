@@ -37,6 +37,9 @@ const stripe = new Stripe(config.stripe.secretKey, {
 
 // Email sending function
 async function sendOrderConfirmationEmail(orderData: OrderData) {
+  console.log('📧 Creating email transporter...');
+  addWebhookLog('📧 Creating email transporter...');
+  
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -44,6 +47,9 @@ async function sendOrderConfirmationEmail(orderData: OrderData) {
       pass: config.email.password,
     },
   });
+  
+  console.log('📧 Email transporter created successfully');
+  addWebhookLog('📧 Email transporter created successfully');
 
   // Customer email
   const customerEmailHtml = `
@@ -95,6 +101,9 @@ async function sendOrderConfirmationEmail(orderData: OrderData) {
   `;
 
   try {
+    console.log('📧 Sending customer email to:', orderData.customerInfo.email);
+    addWebhookLog(`📧 Sending customer email to: ${orderData.customerInfo.email}`);
+    
     // Send customer confirmation
     await transporter.sendMail({
       from: config.email.user,
@@ -102,6 +111,12 @@ async function sendOrderConfirmationEmail(orderData: OrderData) {
       subject: 'Order Confirmation - Mom\'s Fresh Salads',
       html: customerEmailHtml,
     });
+
+    console.log('📧 Customer email sent successfully');
+    addWebhookLog('📧 Customer email sent successfully');
+
+    console.log('📧 Sending business notification email...');
+    addWebhookLog('📧 Sending business notification email...');
 
     // Send business notification
     await transporter.sendMail({
@@ -112,8 +127,10 @@ async function sendOrderConfirmationEmail(orderData: OrderData) {
     });
 
     console.log('✅ Both emails sent successfully');
+    addWebhookLog('✅ Both emails sent successfully');
   } catch (error) {
     console.error('❌ Email sending failed:', error);
+    addWebhookLog(`❌ Email sending failed in function: ${error instanceof Error ? error.message : 'Unknown error'}`);
     throw error;
   }
 }
@@ -211,11 +228,16 @@ export async function POST(request: NextRequest) {
 
     if (event.type === 'charge.succeeded') {
       console.log('🎯 Processing charge.succeeded');
+      addWebhookLog('🎯 Processing charge.succeeded event');
       
       const charge = event.data.object as Stripe.Charge;
       console.log('💰 Charge ID:', charge.id);
       console.log('💰 Amount:', charge.amount);
       console.log('💰 Customer Email:', charge.billing_details.email);
+      
+      addWebhookLog(`💰 Charge ID: ${charge.id}`);
+      addWebhookLog(`💰 Amount: ${charge.amount}`);
+      addWebhookLog(`💰 Customer Email: ${charge.billing_details.email || 'none'}`);
 
       // Create basic order data from charge information
       const orderData = {
@@ -242,15 +264,23 @@ export async function POST(request: NextRequest) {
         amountTotal: (charge.amount / 100).toFixed(2)
       };
 
+      addWebhookLog(`📦 Order data created for: ${orderData.customerInfo.email}`);
+      addWebhookLog(`📦 Total amount: $${orderData.total}`);
+
       // Send confirmation emails
       console.log('📧 Sending confirmation emails for charge...');
+      addWebhookLog('📧 Attempting to send confirmation emails...');
+      
       try {
         await sendOrderConfirmationEmail(orderData);
         console.log('🎉 Charge processed successfully - emails sent!');
+        addWebhookLog('🎉 Emails sent successfully!');
       } catch (emailError) {
         console.error('❌ Email sending failed for charge:', emailError);
         // Don't fail the webhook if email fails
         console.log('⚠️ Continuing despite email failure');
+        addWebhookLog(`❌ Email sending failed: ${emailError instanceof Error ? emailError.message : 'Unknown error'}`);
+        addWebhookLog(`❌ Error stack: ${emailError instanceof Error ? emailError.stack : 'No stack trace'}`);
       }
       
       return NextResponse.json({ received: true });
