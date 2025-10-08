@@ -9,7 +9,7 @@ const decodeKey = (encoded: string) => {
 export const config = {
   // Stripe configuration
   stripe: {
-    secretKey: process.env.STRIPE_SECRET_KEY || decodeKey('c2tfdGVzdF81MVNGZldxSG5WakJWSWZ1b2Znd2NoVFIxdEFkT3ozOFVGRmNRcjZUcFF6Y3ZObXhiVkprTHhsdHdrdGx1enduYmJjc2o='),
+    secretKey: process.env.STRIPE_SECRET_KEY || decodeKey('c2tfdGVzdF81MVNGZldxSG5WakJWSWZ1bzRiTlFEWVFkTWpBWDdhclVlTUQ3TnJBdlg0MG1haXZKRUxXOW93R05BNlIyTUlOUTBONnhKUmZJMXQ3Tnh1UGVzeTNRMXFuVDAweU9tNUlTc2sK'),
     publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_placeholder'
   },
   
@@ -21,7 +21,7 @@ export const config = {
   
   // Environment check
   isProduction: process.env.NODE_ENV === 'production',
-  hasValidStripeKey: (process.env.STRIPE_SECRET_KEY || decodeKey('c2tfdGVzdF81MVNGZldxSG5WakJWSWZ1b2Znd2NoVFIxdEFkT3ozOFVGRmNRcjZUcFF6Y3ZObXhiVkprTHhsdHdrdGx1enduYmJjc2o=')).startsWith('sk_'),
+  hasValidStripeKey: (process.env.STRIPE_SECRET_KEY || decodeKey('c2tfdGVzdF81MVNGZldxSG5WakJWSWZ1bzRiTlFEWVFkTWpBWDdhclVlTUQ3TnJBdlg0MG1haXZKRUxXOW93R05BNlIyTUlOUTBONnhKUmZJMXQ3Tnh1UGVzeTNRMXFuVDAweU9tNUlTc2sK')).startsWith('sk_'),
   hasValidEmailConfig: !!(process.env.GMAIL_USER || decodeKey('eXZlaGVuaWkubGltMjdAZ21haWwuY29t'))
 };
 
