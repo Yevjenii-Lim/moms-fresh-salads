@@ -17,7 +17,7 @@ export const config = {
   // Email configuration
   email: {
     user: process.env.GMAIL_USER || decodeKey('eXZlaGVuaWkubGltMjdAZ21haWwuY29t'),
-    password: process.env.GMAIL_APP_PASSWORD || decodeKey('eGx0d2t0bHV6d25iYmNzag==')
+    password: process.env.GMAIL_APP_PASSWORD || decodeKey('b3Nnb2ZqdGxzeWh1ZnRrZA==')
   },
   
   // Environment check
