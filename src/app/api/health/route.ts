@@ -24,8 +24,8 @@ export async function GET() {
       allStripeGmailVars: allEnvVars,
       // Show total count of all env vars
       totalEnvVars: Object.keys(process.env).length,
-      version: '1.0.2',
-      deploymentTrigger: 'env-debug-detailed'
+      version: '1.0.3',
+      deploymentTrigger: 'manual-redeploy-fix'
     };
 
     return NextResponse.json(healthCheck);
