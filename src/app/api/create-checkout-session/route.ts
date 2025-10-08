@@ -37,6 +37,14 @@ interface CustomerInfo {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('🚀 Create checkout session called - version 2.0.1');
+    console.log('🔧 Configuration status:', {
+      stripeKeyPresent: !!config.stripe.secretKey,
+      stripeKeyValid: config.hasValidStripeKey,
+      emailConfigValid: config.hasValidEmailConfig,
+      nodeEnv: process.env.NODE_ENV
+    });
+
     const { items, customerInfo, subtotal, tax, total }: {
       items: CartItem[];
       customerInfo: CustomerInfo;
@@ -113,9 +121,22 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
-    console.error('Error creating checkout session:', error);
+    console.error('❌ Error creating checkout session:', error);
+    console.error('❌ Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : undefined,
+      configStatus: {
+        stripeKeyPresent: !!config.stripe.secretKey,
+        stripeKeyValid: config.hasValidStripeKey,
+        emailConfigValid: config.hasValidEmailConfig
+      }
+    });
     return NextResponse.json(
-      { error: 'Failed to create checkout session' },
+      { 
+        error: 'Failed to create checkout session',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }

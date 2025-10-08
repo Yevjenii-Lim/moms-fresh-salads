@@ -26,12 +26,12 @@ export const config = {
 };
 
 // Log configuration status (for debugging)
-if (process.env.NODE_ENV === 'development') {
-  console.log('🔧 Development Configuration:', {
-    stripeKey: config.stripe.secretKey ? 'present' : 'missing',
-    emailUser: config.email.user ? 'present' : 'missing',
-    emailPassword: config.email.password ? 'present' : 'missing',
-    hasValidStripeKey: config.hasValidStripeKey,
-    hasValidEmailConfig: config.hasValidEmailConfig
-  });
-}
+console.log('🔧 Configuration loaded - version 2.0.1:', {
+  stripeKey: config.stripe.secretKey ? 'present' : 'missing',
+  stripeKeyPreview: config.stripe.secretKey ? config.stripe.secretKey.substring(0, 8) + '...' : 'missing',
+  emailUser: config.email.user ? 'present' : 'missing',
+  emailPassword: config.email.password ? 'present' : 'missing',
+  hasValidStripeKey: config.hasValidStripeKey,
+  hasValidEmailConfig: config.hasValidEmailConfig,
+  nodeEnv: process.env.NODE_ENV
+});
