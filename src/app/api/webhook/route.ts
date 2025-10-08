@@ -44,14 +44,13 @@ async function sendOrderConfirmationEmail(orderData: OrderData) {
   
   // Use AWS SES instead of Gmail
   const ses = new SES({
-    apiVersion: '2010-12-01',
     region: process.env.AWS_REGION || 'us-east-1',
     credentials: defaultProvider(),
   });
   
   const transporter = nodemailer.createTransport({
-    SES: { ses, aws: { SES } },
-  });
+    SES: { ses, aws: require('@aws-sdk/client-ses') },
+  } as any);
   
   console.log('📧 SES email transporter created successfully');
   addWebhookLog('📧 SES email transporter created successfully');
