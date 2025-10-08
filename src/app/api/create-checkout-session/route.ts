@@ -12,7 +12,8 @@ console.log('Configuration check:', {
   gmailUser: config.email.user ? 'present' : 'missing',
   gmailPassword: config.email.password ? 'present' : 'missing',
   hasValidStripeKey: config.hasValidStripeKey,
-  stripeInitialized: 'yes'
+  stripeInitialized: 'yes',
+  deploymentVersion: '2.0.1-fix-deployment-cache'
 });
 
 interface CartItem {
@@ -107,7 +108,7 @@ export async function POST(request: NextRequest) {
       console.log('📧 To test emails locally, complete the EventBridge setup or use the test-email page');
     } else {
       console.log('✅ Checkout session created, emails will be sent via EventBridge after payment completion');
-      console.log('🚀 Deployment version: ' + new Date().toISOString());
+      console.log('🚀 Deployment version: 2.0.1-fix-deployment-cache - ' + new Date().toISOString());
     }
 
     return NextResponse.json({ url: session.url });

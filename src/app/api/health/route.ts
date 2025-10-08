@@ -22,8 +22,8 @@ export async function GET() {
       // System info
       totalEnvVars: Object.keys(process.env).length,
       firstTenEnvVars: Object.keys(process.env).slice(0, 10),
-      version: '2.0.0',
-      deploymentTrigger: 'config-based-solution'
+               version: '2.0.1',
+               deploymentTrigger: 'fix-deployment-cache-issue'
     };
 
     return NextResponse.json(healthCheck);
