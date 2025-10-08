@@ -242,7 +242,7 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Navigation */}
-      <nav className="navbar">
+      <nav className={`navbar ${showCheckout ? 'hidden' : ''}`}>
         <div className="nav-container">
           <div className="nav-logo">
             <i className="fas fa-leaf"></i>
