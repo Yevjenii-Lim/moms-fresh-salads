@@ -103,11 +103,11 @@ async function sendOrderConfirmationEmail(orderData: OrderData) {
     </div>
   `;
 
+  // Send customer email (don't fail if this fails)
   try {
     console.log('📧 Sending customer email to:', orderData.customerInfo.email);
     addWebhookLog(`📧 Sending customer email to: ${orderData.customerInfo.email}`);
     
-    // Send customer confirmation
     await transporter.sendMail({
       from: `Mom's Fresh Salads <${config.email.sender}>`,
       to: orderData.customerInfo.email,
@@ -115,13 +115,19 @@ async function sendOrderConfirmationEmail(orderData: OrderData) {
       html: customerEmailHtml,
     });
 
-    console.log('📧 Customer email sent successfully');
-    addWebhookLog('📧 Customer email sent successfully');
+    console.log('✅ Customer email sent successfully');
+    addWebhookLog('✅ Customer email sent successfully');
+  } catch (error) {
+    console.error('⚠️ Customer email failed (may be unverified):', error);
+    addWebhookLog(`⚠️ Customer email failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    // Don't throw - continue to send business notification
+  }
 
+  // Always send business notification (even if customer email fails)
+  try {
     console.log('📧 Sending business notification email...');
     addWebhookLog('📧 Sending business notification email...');
 
-    // Send business notification
     await transporter.sendMail({
       from: `Mom's Fresh Salads <${config.email.sender}>`,
       to: config.email.sender, // Send to business email
@@ -129,12 +135,12 @@ async function sendOrderConfirmationEmail(orderData: OrderData) {
       html: businessEmailHtml,
     });
 
-    console.log('✅ Both emails sent successfully');
-    addWebhookLog('✅ Both emails sent successfully');
+    console.log('✅ Business notification sent successfully');
+    addWebhookLog('✅ Business notification sent successfully');
   } catch (error) {
-    console.error('❌ Email sending failed:', error);
-    addWebhookLog(`❌ Email sending failed in function: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    throw error;
+    console.error('❌ Business notification failed:', error);
+    addWebhookLog(`❌ Business notification failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw error; // This is critical, so throw if it fails
   }
 }
 
