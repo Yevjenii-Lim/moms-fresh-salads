@@ -68,7 +68,12 @@ export async function POST(request: NextRequest) {
     // Create Stripe checkout session
     console.log('🎯 Creating Stripe checkout session...');
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
+      payment_method_types: ['card', 'link'],
+      payment_method_options: {
+        card: {
+          request_three_d_secure: 'automatic',
+        },
+      },
       line_items: items.map((item: CartItem) => ({
         price_data: {
           currency: 'usd',

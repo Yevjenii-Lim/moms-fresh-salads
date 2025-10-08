@@ -298,52 +298,28 @@ export default function Home() {
               <h3>Contact Information</h3>
               <div className="contact-item">
                 <i className="fas fa-phone"></i>
-                <span>(555) 123-SALAD</span>
+                <span>(319))693-6570</span>
               </div>
               <div className="contact-item">
                 <i className="fas fa-envelope"></i>
-                <span>orders@momsfreshsalads.com</span>
+                <span>yevhenii.lim27@gmail.com</span>
               </div>
-              <div className="contact-item">
-                <i className="fas fa-map-marker-alt"></i>
-                <span>123 Fresh Street<br />Healthy City, HC 12345</span>
-              </div>
+            
               <div className="hours">
                 <h4>Business Hours</h4>
-                <p>Monday - Friday: 10:00 AM - 7:00 PM<br />
+                <p>Monday - Friday: 10:00 AM - 10:00 PM<br />
                 Saturday: 9:00 AM - 6:00 PM<br />
                 Sunday: Closed</p>
               </div>
             </div>
-            <div className="contact-form">
-              <h3>Send us a Message</h3>
-              <form onSubmit={handleContactSubmit}>
-                <div className="form-group">
-                  <label htmlFor="name">Full Name</label>
-                  <input type="text" id="name" name="name" required />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="email">Email</label>
-                  <input type="email" id="email" name="email" required />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="subject">Subject</label>
-                  <input type="text" id="subject" name="subject" required />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="message">Message</label>
-                  <textarea id="message" name="message" rows={4} required></textarea>
-                </div>
-                <button type="submit" className="btn btn-primary">Send Message</button>
-              </form>
-            </div>
+     
           </div>
         </div>
       </section>
 
       {/* Cart Sidebar */}
       {isCartOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
+        <div className="fixed inset-0 overflow-hidden" style={{ zIndex: 2500 }}>
           <div className="cart-overlay active" onClick={() => setIsCartOpen(false)} />
           <div 
             className="cart-sidebar active"
@@ -549,14 +525,10 @@ export default function Home() {
               <a href="#about">About</a>
               <a href="#contact">Contact</a>
             </div>
-            <div className="social-links">
-              <a href="#"><i className="fab fa-facebook"></i></a>
-              <a href="#"><i className="fab fa-instagram"></i></a>
-              <a href="#"><i className="fab fa-twitter"></i></a>
-            </div>
+          
           </div>
           <div className="footer-bottom">
-            <p>&copy; 2024 Mom&apos;s Fresh Salads. Made with ❤️ for healthy living.</p>
+            <p>&copy; 2025 Mom&apos;s Fresh Salads. Made with ❤️ for healthy living.</p>
           </div>
         </div>
       </footer>
