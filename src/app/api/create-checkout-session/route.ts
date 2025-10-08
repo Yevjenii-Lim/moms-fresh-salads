@@ -38,106 +38,7 @@ interface CustomerInfo {
   instructions?: string;
 }
 
-// Email sending function (moved to webhook)
-// async function sendOrderConfirmationEmail(orderData: {
-  sessionId: string;
-  customerInfo: {
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
-    instructions: string;
-  };
-  items: CartItem[];
-  total: number;
-  subtotal: number;
-  tax: number;
-}) {
-  try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: config.email.user,
-        pass: config.email.password,
-      },
-    });
-
-    // Customer email
-    const customerEmailHtml = `
-      <h2>Thank you for your order!</h2>
-      <p>Hi ${orderData.customerInfo.name},</p>
-      <p>We've received your order and are preparing it for you.</p>
-      
-      <h3>Order Details:</h3>
-      <p><strong>Order ID:</strong> ${orderData.sessionId}</p>
-      
-      <h3>Items:</h3>
-      ${orderData.items.map(item => `
-        <div style="border: 1px solid #ddd; padding: 10px; margin: 5px 0;">
-          <strong>${item.name}</strong><br>
-          Quantity: ${item.quantity}<br>
-          Price: $${item.price.toFixed(2)} each
-        </div>
-      `).join('')}
-      
-      <p><strong>Subtotal:</strong> $${orderData.subtotal.toFixed(2)}</p>
-      <p><strong>Tax:</strong> $${orderData.tax.toFixed(2)}</p>
-      <p><strong>Total:</strong> $${orderData.total.toFixed(2)}</p>
-      
-      <p>We'll send you another email when your order is ready for pickup!</p>
-      <p>Thank you for choosing Mom&apos;s Fresh Salads!</p>
-    `;
-
-    // Business email
-    const businessEmailHtml = `
-      <h2>New Order Received</h2>
-      <p><strong>Order ID:</strong> ${orderData.sessionId}</p>
-      
-      <h3>Customer Information:</h3>
-      <p><strong>Name:</strong> ${orderData.customerInfo.name}</p>
-      <p><strong>Email:</strong> ${orderData.customerInfo.email}</p>
-      <p><strong>Phone:</strong> ${orderData.customerInfo.phone}</p>
-      <p><strong>Address:</strong> ${orderData.customerInfo.address}</p>
-      ${orderData.customerInfo.instructions ? `<p><strong>Special Instructions:</strong> ${orderData.customerInfo.instructions}</p>` : ''}
-      
-      <h3>Order Items:</h3>
-      ${orderData.items.map(item => `
-        <div style="border: 1px solid #ddd; padding: 10px; margin: 5px 0;">
-          <strong>${item.name}</strong><br>
-          Quantity: ${item.quantity}<br>
-          Price: $${item.price.toFixed(2)} each
-        </div>
-      `).join('')}
-      
-      <p><strong>Subtotal:</strong> $${orderData.subtotal.toFixed(2)}</p>
-      <p><strong>Tax:</strong> $${orderData.tax.toFixed(2)}</p>
-      <p><strong>Total:</strong> $${orderData.total.toFixed(2)}</p>
-    `;
-
-    // Send customer email
-    await transporter.sendMail({
-      from: config.email.user,
-      to: orderData.customerInfo.email,
-      subject: `Order Confirmation - ${orderData.sessionId}`,
-      html: customerEmailHtml,
-    });
-
-    // Send business email
-    await transporter.sendMail({
-      from: config.email.user,
-      to: config.email.user, // Send to business email
-      subject: `New Order - ${orderData.sessionId}`,
-      html: businessEmailHtml,
-    });
-
-    console.log('Order confirmation email sent to:', orderData.customerInfo.email);
-    console.log('Business notification email sent');
-
-  } catch (error) {
-    console.error('Failed to send order confirmation email:', error);
-    throw error;
-  }
-}
+// Email sending function moved to webhook handler
 
 export async function POST(request: NextRequest) {
   try {
@@ -238,7 +139,7 @@ export async function POST(request: NextRequest) {
       }
     });
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to create checkout session',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
