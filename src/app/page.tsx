@@ -289,19 +289,16 @@ export default function Home() {
             <p>Discover the perfect blend of crisp vegetables, premium ingredients, and homemade dressings crafted by mom&apos;s skilled hands.</p>
             <div className="hero-delivery">
               <i className="fas fa-truck"></i>
-              <span>Free Delivery in Spartanburg & Greenville, SC</span>
+              <span>Free Delivery in SC:<br></br> Spartanburg, Greer, Greenville,Inman, Lyman, Cowpens, Bouling Springs, Duncan, Union, Greenwood, Laurens, Moore</span>
             </div>
-            <div className="hero-service-area">
-              <i className="fas fa-map-marker-alt"></i>
-              <span>We serve Spartanburg & Greenville Counties, South Carolina</span>
-            </div>
+         
             <div className="hero-buttons">
               <a href="#menu" className="btn btn-primary">View Menu</a>
               <a href="#contact" className="btn btn-secondary">Contact Us</a>
             </div>
           </div>
           <div className="hero-image">
-            <Image src="https://eurasianbowl.s3.us-east-1.amazonaws.com/salads/carrot.jpg" alt="Hero Image" fill className="object-cover" />
+            <Image src="https://eurasianbowl.s3.us-east-1.amazonaws.com/salads/hero-logo.png" alt="Hero Image" fill className="object-contain" />
 
           </div>
         </div>
@@ -384,16 +381,7 @@ export default function Home() {
                 <i className="fas fa-envelope"></i>
                 <span>yevhenii.lim27@gmail.com</span>
               </div>
-              
-              <div className="contact-item">
-                <i className="fas fa-truck"></i>
-                <span>Free Delivery in Spartanburg & Greenville, SC</span>
-              </div>
-              
-              <div className="contact-item">
-                <i className="fas fa-map-marker-alt"></i>
-                <span>We serve Spartanburg & Greenville Counties, SC</span>
-              </div>
+     
             
               <div className="hours">
                 <h4>Business Hours</h4>
