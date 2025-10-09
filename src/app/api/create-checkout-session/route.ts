@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     console.log('Order created:', {
       sessionId: session.id,
       customerEmail: customerInfo.email,
-      customerName: `${customerInfo.firstName} ${customerInfo.lastName}`,
+      customerName: customerInfo.name,
       customerPhone: customerInfo.phone,
       amountTotal: total,
       orderItems: items,

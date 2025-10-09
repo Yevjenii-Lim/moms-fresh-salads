@@ -536,7 +536,7 @@ export default function Home() {
                 <form className="space-y-3">
                   <input
                     type="text"
-                    placeholder="Name"
+                    placeholder="Name for the order"
                     value={customerInfo.name}
                     onChange={(e) => setCustomerInfo(prev => ({ ...prev, name: e.target.value }))}
                     className={`w-full px-3 py-2.5 text-base border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${formErrors.name ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
