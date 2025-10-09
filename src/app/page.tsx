@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 
 interface MenuItem {
   id: string;
@@ -9,6 +10,7 @@ interface MenuItem {
   price: number;
   image: string;
   category: string;
+  quantity: string;
 }
 
 interface CartItem extends MenuItem {
@@ -18,44 +20,50 @@ interface CartItem extends MenuItem {
 const menuItems: MenuItem[] = [
   {
     id: 'caesar',
-    name: 'Classic Caesar Salad',
-    description: 'Fresh romaine lettuce, parmesan cheese, croutons, and our signature caesar dressing',
-    price: 12.99,
-    image: '🥗',
-    category: 'classic'
+    name: 'Classic Korean Carrot Salad',
+    description: 'Spicy, tangy shredded carrots with garlic and chili oil, a crisp and flavorful salad loved across Eastern Europe.',
+    price: 9.99,
+    image: "https://eurasianbowl.s3.us-east-1.amazonaws.com/salads/carrot.jpg",
+    category: 'classic',
+    quantity: '1 lb'
   },
   {
     id: 'greek',
-    name: 'Greek Garden Salad',
-    description: 'Mixed greens, tomatoes, cucumbers, olives, feta cheese, and greek dressing',
-    price: 13.99,
-    image: '🥙',
-    category: 'classic'
+    name: 'Cabbage & Cucumber Salad',
+    description: 'Light and crunchy mix of shredded cabbage, fresh cucumber, and dill, tossed in a simple tangy dressing for a refreshing taste.',
+    price: 9.99,
+    image: 'https://eurasianbowl.s3.us-east-1.amazonaws.com/salads/cabbage.jpg',
+    category: 'classic',
+    quantity: '1 lb'
   },
   {
-    id: 'cobb',
-    name: 'Cobb Salad',
-    description: 'Romaine lettuce, grilled chicken, bacon, avocado, blue cheese, and ranch dressing',
-    price: 15.99,
-    image: '🥗',
-    category: 'premium'
+    id: 'Funchoza',
+    name: 'Funchoza Salad',
+    description: 'A colorful noodle salad with glass noodles, tender beef, fresh vegetables, and herbs tossed in a savory soy-garlic dressing. Light, flavorful, and full of texture.',
+    price: 11.99,
+    image: 'https://eurasianbowl.s3.us-east-1.amazonaws.com/salads/funchoza.jpg',
+    category: 'premium',
+    quantity: '1 lb'
   },
   {
-    id: 'quinoa',
-    name: 'Quinoa Power Bowl',
-    description: 'Quinoa, kale, chickpeas, roasted vegetables, and tahini dressing',
-    price: 14.99,
-    image: '🥗',
-    category: 'healthy'
+    id: 'Samsa',
+    name: 'Samsa',
+    description: 'Flaky golden pastries filled with seasoned meat and onions, baked to perfection for a crisp outside and juicy, savory inside. A classic Central Asian favorite.',
+    price: 9.99,
+    image: 'https://eurasianbowl.s3.us-east-1.amazonaws.com/salads/samsa.jpg',
+    category: 'healthy',
+    quantity: '5 pieces'
   },
   {
     id: 'test',
     name: '🧪 Test Payment Item',
-    description: 'This is a test item for payment system testing. Perfect for verifying Stripe integration!',
-    price: 1.00,
+    description: 'This is a test item for payment system testing. Perfect for verifying Stripe integration and email confirmations!',
+    price: 0.50,
     image: '🧪',
-    category: 'test'
+    category: 'test',
+    quantity: '1 test'
   }
+
 ];
 
 export default function Home() {
@@ -274,16 +282,22 @@ export default function Home() {
           <div>
             <h1>Fresh, Healthy Salads Made with Love</h1>
             <p>Discover the perfect blend of crisp vegetables, premium ingredients, and homemade dressings crafted by mom&apos;s skilled hands.</p>
+            <div className="hero-delivery">
+              <i className="fas fa-truck"></i>
+              <span>Free Delivery in Spartanburg & Greenville, SC</span>
+            </div>
+            <div className="hero-service-area">
+              <i className="fas fa-map-marker-alt"></i>
+              <span>We serve Spartanburg & Greenville Counties, South Carolina</span>
+            </div>
             <div className="hero-buttons">
               <a href="#menu" className="btn btn-primary">View Menu</a>
               <a href="#contact" className="btn btn-secondary">Contact Us</a>
             </div>
           </div>
           <div className="hero-image">
-            <div className="salad-placeholder">
-              <i className="fas fa-seedling"></i>
-              <p>Fresh Salad Image</p>
-            </div>
+            <Image src="https://eurasianbowl.s3.us-east-1.amazonaws.com/salads/carrot.jpg" alt="Hero Image" fill className="object-cover" />
+
           </div>
         </div>
       </section>
@@ -296,11 +310,27 @@ export default function Home() {
             {menuItems.map((item) => (
               <div key={item.id} className={`menu-item ${item.id === 'test' ? 'test-item' : ''}`}>
                 <div className="menu-image">
-                  <i className="fas fa-image"></i>
+                  {item.image.startsWith('http') ? (
+                    <Image 
+                      src={item.image} 
+                      alt={item.name} 
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                  ) : (
+                    <div className="text-6xl flex items-center justify-center h-24 w-full">
+                      {item.image}
+                    </div>
+                  )}
                 </div>
                 <div className="menu-content">
                   <h3>{item.name}</h3>
                   <p>{item.description}</p>
+                  <div className="menu-quantity">
+                    <i className="fas fa-weight-hanging"></i>
+                    <span>{item.quantity}</span>
+                  </div>
                   <div className="price">${item.price.toFixed(2)}</div>
                   <button
                     onClick={() => addToCart(item)}
@@ -323,12 +353,11 @@ export default function Home() {
             <div className="about-text">
               <h2>About Mom&apos;s Kitchen</h2>
               <p>For over 20 years, Mom has been perfecting her salad recipes, combining traditional cooking methods with fresh, local ingredients. Each salad is prepared with the same care and attention that she would give to her own family.</p>
-              <p>Our mission is to bring healthy, delicious meals to your table while supporting local farmers and suppliers. Every ingredient is carefully selected for quality, freshness, and nutritional value.</p>
+        
             </div>
             <div className="about-image">
               <div className="chef-placeholder">
-                <i className="fas fa-user-friends"></i>
-                <p>Mom in the Kitchen</p>
+           <Image src="https://eurasianbowl.s3.us-east-1.amazonaws.com/salads/IMG_0787.jpg" alt="Chef Image" fill className="object-cover" />
               </div>
             </div>
           </div>
@@ -344,11 +373,21 @@ export default function Home() {
               <h3>Contact Information</h3>
               <div className="contact-item">
                 <i className="fas fa-phone"></i>
-                <span>(319))693-6570</span>
+                <span>(319) 693-6570</span>
               </div>
               <div className="contact-item">
                 <i className="fas fa-envelope"></i>
                 <span>yevhenii.lim27@gmail.com</span>
+              </div>
+              
+              <div className="contact-item">
+                <i className="fas fa-truck"></i>
+                <span>Free Delivery in Spartanburg & Greenville, SC</span>
+              </div>
+              
+              <div className="contact-item">
+                <i className="fas fa-map-marker-alt"></i>
+                <span>We serve Spartanburg & Greenville Counties, SC</span>
               </div>
             
               <div className="hours">
@@ -395,7 +434,21 @@ export default function Home() {
                   <div>
                     {cart.map((item) => (
                       <div key={item.id} className="cart-item">
-                        <div className="text-2xl">{item.image}</div>
+                        <div className="cart-item-image">
+                          {item.image.startsWith('http') ? (
+                            <Image 
+                              src={item.image} 
+                              alt={item.name} 
+                              width={60} 
+                              height={60}
+                              className="rounded-lg object-cover"
+                            />
+                          ) : (
+                            <div className="text-2xl flex items-center justify-center w-15 h-15">
+                              {item.image}
+                            </div>
+                          )}
+                        </div>
                         <div className="cart-item-info">
                           <div className="cart-item-name">{item.name}</div>
                           <div className="cart-item-price">${item.price.toFixed(2)} each</div>

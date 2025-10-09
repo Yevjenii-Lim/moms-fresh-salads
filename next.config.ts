@@ -8,6 +8,16 @@ const nextConfig: NextConfig = {
     GMAIL_USER: process.env.GMAIL_USER,
     GMAIL_APP_PASSWORD: process.env.GMAIL_APP_PASSWORD,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'eurasianbowl.s3.us-east-1.amazonaws.com',
+        port: '',
+        pathname: '/salads/**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

@@ -37,22 +37,20 @@ const stripe = new Stripe(config.stripe.secretKey, {
 
 // Email sending function using AWS SES SMTP
 async function sendOrderConfirmationEmail(orderData: OrderData) {
-  console.log('📧 Creating SES SMTP email transporter...');
-  addWebhookLog('📧 Creating SES SMTP email transporter...');
+  console.log('📧 Creating Gmail SMTP email transporter...');
+  addWebhookLog('📧 Creating Gmail SMTP email transporter...');
   
-  // Use AWS SES SMTP (simpler and more reliable than SDK)
+  // Use Gmail SMTP (no verification needed)
   const transporter = nodemailer.createTransport({
-    host: 'email-smtp.us-east-1.amazonaws.com',
-    port: 587,
-    secure: false, // Use TLS
+    service: 'gmail',
     auth: {
-      user: process.env.AWS_SES_SMTP_USER || config.email.user,
-      pass: process.env.AWS_SES_SMTP_PASSWORD || config.email.password,
+      user: process.env.GMAIL_USER || config.email.sender,
+      pass: process.env.GMAIL_APP_PASSWORD || config.email.password,
     },
   });
   
-  console.log('📧 SES SMTP email transporter created successfully');
-  addWebhookLog('📧 SES SMTP email transporter created successfully');
+  console.log('📧 Gmail SMTP email transporter created successfully');
+  addWebhookLog('📧 Gmail SMTP email transporter created successfully');
 
   // Customer email
   const customerEmailHtml = `
