@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
+import TelegramBot from 'node-telegram-bot-api';
 import { config } from '../../../config/keys';
 import { addWebhookLog } from '../webhook-logs/route';
 
@@ -34,6 +35,65 @@ const stripe = new Stripe(config.stripe.secretKey, {
   maxNetworkRetries: 3,
   httpClient: Stripe.createFetchHttpClient(),
 });
+
+// Telegram notification function
+async function sendTelegramNotification(orderData: OrderData) {
+  try {
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    
+    if (!botToken || !chatId) {
+      console.log('⚠️ Telegram credentials not configured');
+      addWebhookLog('⚠️ Telegram credentials not configured');
+      return;
+    }
+
+    console.log('📱 Sending Telegram notification...');
+    addWebhookLog('📱 Sending Telegram notification...');
+
+    const message = `
+🛒 *New Order Received*
+
+👤 *Customer:* ${orderData.customerInfo.firstName} ${orderData.customerInfo.lastName}
+📧 *Email:* ${orderData.customerInfo.email}
+📞 *Phone:* ${orderData.customerInfo.phone}
+📍 *Address:* ${orderData.customerInfo.address}
+${orderData.customerInfo.instructions ? `📝 *Instructions:* ${orderData.customerInfo.instructions}` : ''}
+
+🛍️ *Order Details:*
+💰 *Total:* $${orderData.total}
+📋 *Items:*
+${orderData.items.map(item => `• ${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`).join('\n')}
+
+🆔 *Order ID:* ${orderData.sessionId}
+⏰ *Time:* ${new Date().toLocaleString()}
+    `.trim();
+
+    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'Markdown',
+      }),
+    });
+
+    if (response.ok) {
+      console.log('✅ Telegram notification sent successfully');
+      addWebhookLog('✅ Telegram notification sent successfully');
+    } else {
+      const error = await response.text();
+      console.error('❌ Telegram notification failed:', error);
+      addWebhookLog(`❌ Telegram notification failed: ${error}`);
+    }
+  } catch (error) {
+    console.error('❌ Telegram notification error:', error);
+    addWebhookLog(`❌ Telegram notification error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
 
 // Email sending function using AWS SES SMTP
 async function sendOrderConfirmationEmail(orderData: OrderData) {
@@ -76,32 +136,6 @@ async function sendOrderConfirmationEmail(orderData: OrderData) {
     </div>
   `;
 
-  // Business notification email
-  const businessEmailHtml = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #2d5a27;">New Order Received</h2>
-      
-      <h3>Customer Information:</h3>
-      <p><strong>Name:</strong> ${orderData.customerInfo.firstName} ${orderData.customerInfo.lastName}</p>
-      <p><strong>Email:</strong> ${orderData.customerInfo.email}</p>
-      <p><strong>Phone:</strong> ${orderData.customerInfo.phone}</p>
-      <p><strong>Address:</strong> ${orderData.customerInfo.address}</p>
-      ${orderData.customerInfo.instructions ? `<p><strong>Instructions:</strong> ${orderData.customerInfo.instructions}</p>` : ''}
-      
-      <h3>Order Details:</h3>
-      <p><strong>Order ID:</strong> ${orderData.sessionId}</p>
-      <p><strong>Subtotal:</strong> $${orderData.subtotal}</p>
-      <p><strong>Tax:</strong> $${orderData.tax}</p>
-      <p><strong>Total:</strong> $${orderData.total}</p>
-      
-      <h3>Items:</h3>
-      <ul>
-      ${orderData.items.map((item) => 
-        `<li>${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}</li>`
-      ).join('')}
-      </ul>
-    </div>
-  `;
 
   // Send customer email (don't fail if this fails)
   try {
@@ -132,25 +166,8 @@ async function sendOrderConfirmationEmail(orderData: OrderData) {
     // Don't throw - continue to send business notification
   }
 
-  // Always send business notification (even if customer email fails)
-  try {
-    console.log('📧 Sending business notification email...');
-    addWebhookLog('📧 Sending business notification email...');
-
-    await transporter.sendMail({
-      from: `Mom's Fresh Salads <${config.email.sender}>`,
-      to: config.email.sender, // Send to business email
-      subject: `New Order - ${orderData.customerInfo.firstName} ${orderData.customerInfo.lastName}`,
-      html: businessEmailHtml,
-    });
-
-    console.log('✅ Business notification sent successfully');
-    addWebhookLog('✅ Business notification sent successfully');
-  } catch (error) {
-    console.error('❌ Business notification failed:', error);
-    addWebhookLog(`❌ Business notification failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    throw error; // This is critical, so throw if it fails
-  }
+  // Send Telegram notification for business (even if customer email fails)
+  await sendTelegramNotification(orderData);
 }
 
 export async function POST(request: NextRequest) {
