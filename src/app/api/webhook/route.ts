@@ -37,20 +37,22 @@ const stripe = new Stripe(config.stripe.secretKey, {
 
 // Email sending function using AWS SES SMTP
 async function sendOrderConfirmationEmail(orderData: OrderData) {
-  console.log('📧 Creating Gmail SMTP email transporter...');
-  addWebhookLog('📧 Creating Gmail SMTP email transporter...');
+  console.log('📧 Creating AWS SES SMTP email transporter...');
+  addWebhookLog('📧 Creating AWS SES SMTP email transporter...');
   
-  // Use Gmail SMTP (no verification needed)
+  // Use AWS SES SMTP
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'email-smtp.us-east-1.amazonaws.com',
+    port: 587,
+    secure: false, // Use TLS
     auth: {
-      user: process.env.GMAIL_USER || config.email.sender,
-      pass: process.env.GMAIL_APP_PASSWORD || config.email.password,
+      user: process.env.AWS_SES_SMTP_USER || config.email.user,
+      pass: process.env.AWS_SES_SMTP_PASSWORD || config.email.password,
     },
   });
   
-  console.log('📧 Gmail SMTP email transporter created successfully');
-  addWebhookLog('📧 Gmail SMTP email transporter created successfully');
+  console.log('📧 AWS SES SMTP email transporter created successfully');
+  addWebhookLog('📧 AWS SES SMTP email transporter created successfully');
 
   // Customer email
   const customerEmailHtml = `
@@ -118,6 +120,15 @@ async function sendOrderConfirmationEmail(orderData: OrderData) {
   } catch (error) {
     console.error('⚠️ Customer email failed (may be unverified):', error);
     addWebhookLog(`⚠️ Customer email failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    
+    // Check if it's an email verification error
+    if (error instanceof Error && error.message.includes('Email address is not verified')) {
+      console.log('📧 Email verification required. Please verify this email in AWS SES:');
+      console.log(`📧 Customer email: ${orderData.customerInfo.email}`);
+      addWebhookLog(`📧 Email verification required for: ${orderData.customerInfo.email}`);
+      addWebhookLog('📧 To fix: Go to AWS SES → Verified identities → Add this email');
+    }
+    
     // Don't throw - continue to send business notification
   }
 

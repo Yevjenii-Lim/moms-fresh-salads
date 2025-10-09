@@ -13,8 +13,15 @@ interface MenuItem {
   quantity: string;
 }
 
-interface CartItem extends MenuItem {
-  quantity: number;
+interface CartItem {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+  quantity: number; // This is the cart quantity (how many items)
+  itemQuantity: string; // This is the item portion size (like "1 lb")
 }
 
 const menuItems: MenuItem[] = [
@@ -98,7 +105,11 @@ export default function Home() {
             : cartItem
         );
       }
-      return [...prev, { ...item, quantity: 1 }];
+      return [...prev, { 
+        ...item, 
+        quantity: 1,
+        itemQuantity: item.quantity // Store the portion size separately
+      }];
     });
   };
 
