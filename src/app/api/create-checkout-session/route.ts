@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       customer_email: customerInfo.email,
       metadata: {
         orderId: Date.now().toString(),
-        customerName: `${customerInfo.firstName} ${customerInfo.lastName}`,
+        customerName: customerInfo.name,
         customerPhone: customerInfo.phone,
         customerAddress: customerInfo.address,
         specialInstructions: customerInfo.instructions || '',
