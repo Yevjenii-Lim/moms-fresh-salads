@@ -231,8 +231,7 @@ export async function POST(request: NextRequest) {
       const orderData = {
         sessionId: session.id,
         customerInfo: {
-          firstName: session.metadata?.customerName?.split(' ')[0] || 'Customer',
-          lastName: session.metadata?.customerName?.split(' ').slice(1).join(' ') || '',
+          name: session.metadata?.customerName || 'Customer',
           email: session.customer_email || '',
           phone: session.metadata?.customerPhone || '',
           address: session.metadata?.customerAddress || '',
