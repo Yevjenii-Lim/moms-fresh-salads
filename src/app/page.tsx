@@ -177,8 +177,7 @@ export default function Home() {
       setFormErrors(errors);
       
       // Show specific error message
-      if (errors.firstName) alert('Please enter your first name');
-      else if (errors.lastName) alert('Please enter your last name');
+      if (errors.name) alert('Please enter your name');
       else if (errors.email) alert('Please enter a valid email address');
       else if (errors.phone) alert('Please enter your phone number');
       else if (errors.address) alert('Please enter your delivery address');
