@@ -30,8 +30,7 @@ interface CartItem {
 }
 
 interface CustomerInfo {
-  firstName: string;
-  lastName: string;
+  name: string;
   email: string;
   phone: string;
   address: string;

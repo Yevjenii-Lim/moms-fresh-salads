@@ -8,8 +8,7 @@ import { addWebhookLog } from '../webhook-logs/route';
 interface OrderData {
   sessionId: string;
   customerInfo: {
-    firstName: string;
-    lastName: string;
+    name: string;
     email: string;
     phone: string;
     address: string;
@@ -54,7 +53,7 @@ async function sendTelegramNotification(orderData: OrderData) {
     const message = `
 🛒 *New Order Received*
 
-👤 *Customer:* ${orderData.customerInfo.firstName} ${orderData.customerInfo.lastName}
+👤 *Customer:* ${orderData.customerInfo.name}
 📧 *Email:* ${orderData.customerInfo.email}
 📞 *Phone:* ${orderData.customerInfo.phone}
 📍 *Address:* ${orderData.customerInfo.address}
@@ -118,7 +117,7 @@ async function sendOrderConfirmationEmail(orderData: OrderData) {
   const customerEmailHtml = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #2d5a27;">Thank you for your order!</h2>
-      <p>Hi ${orderData.customerInfo.firstName},</p>
+      <p>Hi ${orderData.customerInfo.name},</p>
       <p>Your order has been confirmed and is being prepared.</p>
       
       <h3>Order Details:</h3>

@@ -78,8 +78,7 @@ export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
   const [customerInfo, setCustomerInfo] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     phone: '',
     address: '',
@@ -87,8 +86,7 @@ export default function Home() {
   });
 
   const [formErrors, setFormErrors] = useState({
-    firstName: false,
-    lastName: false,
+    name: false,
     email: false,
     phone: false,
     address: false
@@ -154,8 +152,7 @@ export default function Home() {
   const processPayment = async () => {
     // Reset errors
     setFormErrors({
-      firstName: false,
-      lastName: false,
+      name: false,
       email: false,
       phone: false,
       address: false
@@ -163,8 +160,7 @@ export default function Home() {
 
     // Validate customer information
     const errors = {
-      firstName: !customerInfo.firstName.trim(),
-      lastName: !customerInfo.lastName.trim(),
+      name: !customerInfo.name.trim(),
       email: !customerInfo.email.trim(),
       phone: !customerInfo.phone.trim(),
       address: !customerInfo.address.trim()
@@ -538,24 +534,14 @@ export default function Home() {
                 </div>
                 
                 <form className="space-y-3">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <input
-                      type="text"
-                      placeholder="First Name"
-                      value={customerInfo.firstName}
-                      onChange={(e) => setCustomerInfo(prev => ({ ...prev, firstName: e.target.value }))}
-                      className={`px-3 py-2.5 text-base border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${formErrors.firstName ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
-                      required
-                    />
-                    <input
-                      type="text"
-                      placeholder="Last Name"
-                      value={customerInfo.lastName}
-                      onChange={(e) => setCustomerInfo(prev => ({ ...prev, lastName: e.target.value }))}
-                      className={`px-3 py-2.5 text-base border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${formErrors.lastName ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
-                      required
-                    />
-                  </div>
+                  <input
+                    type="text"
+                    placeholder="Name"
+                    value={customerInfo.name}
+                    onChange={(e) => setCustomerInfo(prev => ({ ...prev, name: e.target.value }))}
+                    className={`w-full px-3 py-2.5 text-base border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${formErrors.name ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
+                    required
+                  />
                   <input
                     type="email"
                     placeholder="Email"
