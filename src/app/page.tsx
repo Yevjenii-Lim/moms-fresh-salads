@@ -61,16 +61,15 @@ const menuItems: MenuItem[] = [
     category: 'healthy',
     quantity: '5 pieces'
   },
-  {
-    id: 'test',
-    name: '🧪 Test Payment Item',
-    description: 'This is a test item for payment system testing. Perfect for verifying Stripe integration and email confirmations!',
-    price: 0.50,
-    image: '🧪',
-    category: 'test',
-    quantity: '1 test'
-  }
-
+  // {
+  //   id: 'test',
+  //   name: '🧪 Test Payment Item',
+  //   description: 'This is a test item for payment system testing. Perfect for verifying Stripe integration and email confirmations!',
+  //   price: 0.50,
+  //   image: '🧪',
+  //   category: 'test',
+  //   quantity: '1 test'
+  // }
 ];
 
 export default function Home() {

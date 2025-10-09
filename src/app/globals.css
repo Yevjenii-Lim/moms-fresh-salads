@@ -1026,31 +1026,6 @@ html {
   }
 }
 
-/* Test item special styling */
-.test-item {
-  border: 2px solid #ff6b6b;
-  background: linear-gradient(135deg, #fff5f5, #ffe0e0);
-}
-
-.test-item h3 {
-  color: #ff6b6b;
-}
-
-.test-item .price {
-  color: #ff6b6b;
-  font-weight: bold;
-}
-
-.test-item button {
-  background: #ff6b6b;
-  border-color: #ff6b6b;
-}
-
-.test-item button:hover {
-  background: #ff5252;
-  border-color: #ff5252;
-}
-
 /* Form focus styles */
 input:focus,
 textarea:focus {
