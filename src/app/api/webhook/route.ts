@@ -259,66 +259,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ received: true });
     }
 
-    if (event.type === 'charge.succeeded') {
-      console.log('🎯 Processing charge.succeeded');
-      addWebhookLog('🎯 Processing charge.succeeded event');
-      
-      const charge = event.data.object as Stripe.Charge;
-      console.log('💰 Charge ID:', charge.id);
-      console.log('💰 Amount:', charge.amount);
-      console.log('💰 Customer Email:', charge.billing_details.email);
-      
-      addWebhookLog(`💰 Charge ID: ${charge.id}`);
-      addWebhookLog(`💰 Amount: ${charge.amount}`);
-      addWebhookLog(`💰 Customer Email: ${charge.billing_details.email || 'none'}`);
-
-      // Create basic order data from charge information
-      const orderData = {
-        sessionId: charge.id, // Use charge ID as session ID
-        customerInfo: {
-          firstName: charge.billing_details.name?.split(' ')[0] || 'Customer',
-          lastName: charge.billing_details.name?.split(' ').slice(1).join(' ') || '',
-          email: charge.billing_details.email || '',
-          phone: charge.billing_details.phone || '',
-          address: charge.billing_details.address ? 
-            `${charge.billing_details.address.line1 || ''} ${charge.billing_details.address.city || ''} ${charge.billing_details.address.state || ''} ${charge.billing_details.address.postal_code || ''}`.trim() : '',
-          instructions: ''
-        },
-        items: [{
-          id: '1',
-          name: 'Salad Order',
-          description: 'Fresh salad order',
-          price: (charge.amount / 100),
-          quantity: 1
-        }],
-        subtotal: (charge.amount / 100).toFixed(2),
-        tax: '0.00',
-        total: (charge.amount / 100).toFixed(2),
-        amountTotal: (charge.amount / 100).toFixed(2)
-      };
-
-      addWebhookLog(`📦 Order data created for: ${orderData.customerInfo.email}`);
-      addWebhookLog(`📦 Total amount: $${orderData.total}`);
-
-      // Send confirmation emails
-      console.log('📧 Sending confirmation emails for charge...');
-      addWebhookLog('📧 Attempting to send confirmation emails...');
-      
-      try {
-        await sendOrderConfirmationEmail(orderData);
-        console.log('🎉 Charge processed successfully - emails sent!');
-        addWebhookLog('🎉 Emails sent successfully!');
-      } catch (emailError) {
-        console.error('❌ Email sending failed for charge:', emailError);
-        // Don't fail the webhook if email fails
-        console.log('⚠️ Continuing despite email failure');
-        addWebhookLog(`❌ Email sending failed: ${emailError instanceof Error ? emailError.message : 'Unknown error'}`);
-        addWebhookLog(`❌ Error stack: ${emailError instanceof Error ? emailError.stack : 'No stack trace'}`);
-      }
-      
-      return NextResponse.json({ received: true });
-    }
-
     console.log('ℹ️ Event type not handled:', event.type);
     return NextResponse.json({ received: true });
 
