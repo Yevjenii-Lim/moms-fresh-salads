@@ -17,3 +17,9 @@ frontend:
     paths:
       - node_modules/**/*
       - .next/cache/**/*
+  environmentVariables:
+    - STRIPE_SECRET_KEY
+    - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+    - STRIPE_WEBHOOK_SECRET
+    - GMAIL_USER
+    - GMAIL_APP_PASSWORD
