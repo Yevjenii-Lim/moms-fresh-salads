@@ -85,6 +85,7 @@ export default function Home() {
   const [showCheckout, setShowCheckout] = useState(false);
   const [showAddedNotification, setShowAddedNotification] = useState(false);
   const [addedItemName, setAddedItemName] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'cash'>('card');
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
     email: '',
@@ -144,8 +145,10 @@ export default function Home() {
 
   const getTotalPrice = () => {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const tax = subtotal * 0.08; // 8% tax
-    return { subtotal, tax, total: subtotal + tax };
+    const discount = paymentMethod === 'cash' ? subtotal * 0.05 : 0; // 5% discount for cash
+    const discountedSubtotal = subtotal - discount;
+    const tax = discountedSubtotal * 0.08; // 8% tax on discounted amount
+    return { subtotal, discount, tax, total: discountedSubtotal + tax };
   };
 
   const processPayment = async () => {
@@ -184,8 +187,42 @@ export default function Home() {
       return;
     }
     
-    const { subtotal, tax, total } = getTotalPrice();
+    const { subtotal, discount, tax, total } = getTotalPrice();
     
+    // Handle cash payment
+    if (paymentMethod === 'cash') {
+      try {
+        const response = await fetch('/api/cash-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            items: cart,
+            customerInfo,
+            subtotal,
+            discount,
+            tax,
+            total
+          }),
+        });
+
+        if (response.ok) {
+          alert('Order received! We will contact you shortly to confirm. Total to pay in cash: $' + total.toFixed(2));
+          setCart([]);
+          setShowCheckout(false);
+          setCustomerInfo({ name: '', email: '', phone: '', address: '', instructions: '' });
+        } else {
+          alert('Failed to submit order. Please try again.');
+        }
+      } catch (error) {
+        console.error('Order failed:', error);
+        alert('Failed to submit order. Please try again.');
+      }
+      return;
+    }
+    
+    // Handle card payment
     try {
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
@@ -552,6 +589,37 @@ export default function Home() {
                     className="w-full px-3 py-2.5 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     rows={2}
                   />
+
+                  {/* Payment Method Selection */}
+                  <div className="border-t pt-4">
+                    <label className="block text-sm font-semibold mb-2">Payment Method:</label>
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod('card')}
+                        className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
+                          paymentMethod === 'card'
+                            ? 'border-green-500 bg-green-50 font-semibold'
+                            : 'border-gray-300 hover:border-gray-400'
+                        }`}
+                      >
+                        <i className="fas fa-credit-card mr-2"></i>
+                        Pay by Card
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod('cash')}
+                        className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
+                          paymentMethod === 'cash'
+                            ? 'border-green-500 bg-green-50 font-semibold'
+                            : 'border-gray-300 hover:border-gray-400'
+                        }`}
+                      >
+                        <i className="fas fa-money-bill-wave mr-2"></i>
+                        Pay Cash (5% off)
+                      </button>
+                    </div>
+                  </div>
                   
                   <div className="border-t pt-4">
                     <div className="space-y-2 mb-4">
@@ -559,6 +627,12 @@ export default function Home() {
                         <span>Subtotal:</span>
                         <span>${getTotalPrice().subtotal.toFixed(2)}</span>
                       </div>
+                      {paymentMethod === 'cash' && getTotalPrice().discount > 0 && (
+                        <div className="flex justify-between text-green-600">
+                          <span>Cash Discount (5%):</span>
+                          <span>-${getTotalPrice().discount.toFixed(2)}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between">
                         <span>Tax:</span>
                         <span>${getTotalPrice().tax.toFixed(2)}</span>
@@ -574,8 +648,17 @@ export default function Home() {
                       onClick={processPayment}
                       className="w-full bg-green-600 text-white py-3.5 text-base rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2 font-semibold"
                     >
-                      <span>💳</span>
-                      <span>Pay ${getTotalPrice().total.toFixed(2)}</span>
+                      {paymentMethod === 'cash' ? (
+                        <>
+                          <span>💵</span>
+                          <span>Place Order (Cash): ${getTotalPrice().total.toFixed(2)}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>💳</span>
+                          <span>Pay by Card: ${getTotalPrice().total.toFixed(2)}</span>
+                        </>
+                      )}
                     </button>
                   </div>
                 </form>
