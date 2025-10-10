@@ -381,6 +381,14 @@ html {
   right: 0;
 }
 
+.cart-sidebar > div {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .cart-header {
   padding: 1.5rem;
   border-bottom: 1px solid #eee;
@@ -447,8 +455,10 @@ html {
 .cart-items {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 1rem;
-  max-height: calc(100vh - 300px);
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
 }
 
 .cart-empty {
