@@ -527,6 +527,7 @@ html {
   padding: 1.5rem;
   border-top: 1px solid #eee;
   background: #f8f9fa;
+  margin-top: auto;
 }
 
 .cart-total {
@@ -555,6 +556,7 @@ html {
   color: white;
   border: none;
   padding: 12px;
+  margin-bottom: 40px;
   border-radius: 8px;
   font-size: 1.1rem;
   font-weight: 600;
