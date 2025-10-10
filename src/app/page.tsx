@@ -130,23 +130,6 @@ export default function Home() {
     setCart(prev => prev.filter(item => item.id !== itemId));
   };
 
-  // Handle swipe to close cart on mobile
-  const handleCartTouchStart = (e: React.TouchEvent) => {
-    const touchStartX = e.touches[0].clientX;
-    e.currentTarget.setAttribute('data-touch-start', touchStartX.toString());
-  };
-
-  const handleCartTouchEnd = (e: React.TouchEvent) => {
-    const touchEndX = e.changedTouches[0].clientX;
-    const touchStartX = parseFloat(e.currentTarget.getAttribute('data-touch-start') || '0');
-    const swipeDistance = touchEndX - touchStartX;
-    
-    // If swiped right more than 100px, close cart
-    if (swipeDistance > 100) {
-      setIsCartOpen(false);
-    }
-  };
-
   const updateQuantity = (itemId: string, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(itemId);
@@ -429,21 +412,14 @@ export default function Home() {
       {isCartOpen && (
         <div className="fixed inset-0 overflow-hidden" style={{ zIndex: 2500 }}>
           <div className="cart-overlay active" onClick={() => setIsCartOpen(false)} />
-          <div 
-            className="cart-sidebar active"
-            onTouchStart={handleCartTouchStart}
-            onTouchEnd={handleCartTouchEnd}
-          >
+          <div className="cart-sidebar active">
             <div className="flex flex-col h-full">
               <div className="cart-header">
                 <h3>Your Cart</h3>
-                <div className="cart-header-actions">
-                  <div className="swipe-hint">← Swipe to close</div>
-                  <button className="cart-close" onClick={() => setIsCartOpen(false)}>
-                    <i className="fas fa-times"></i>
-                    <span className="close-label">Close</span>
-                  </button>
-                </div>
+                <button className="cart-close" onClick={() => setIsCartOpen(false)}>
+                  <i className="fas fa-times"></i>
+                  <span className="close-label">Close</span>
+                </button>
               </div>
               
               <div className="cart-items">
