@@ -11,6 +11,7 @@ interface MenuItem {
   image: string;
   category: string;
   quantity: string;
+  calories: number;
 }
 
 interface CartItem {
@@ -22,6 +23,7 @@ interface CartItem {
   category: string;
   quantity: number; // This is the cart quantity (how many items)
   itemQuantity: string; // This is the item portion size (like "1 lb")
+  calories: number;
 }
 
 const menuItems: MenuItem[] = [
@@ -32,7 +34,8 @@ const menuItems: MenuItem[] = [
     price: 9.99,
     image: "https://eurasianbowl.s3.us-east-1.amazonaws.com/salads/carrot.jpg",
     category: 'classic',
-    quantity: '1 lb'
+    quantity: '1 lb',
+    calories: 200
   },
   {
     id: 'greek',
@@ -41,7 +44,8 @@ const menuItems: MenuItem[] = [
     price: 9.99,
     image: 'https://eurasianbowl.s3.us-east-1.amazonaws.com/salads/cabbage.jpg',
     category: 'classic',
-    quantity: '1 lb'
+    quantity: '1 lb',
+    calories: 150
   },
   {
     id: 'Funchoza',
@@ -50,7 +54,8 @@ const menuItems: MenuItem[] = [
     price: 11.99,
     image: 'https://eurasianbowl.s3.us-east-1.amazonaws.com/salads/funchoza.jpg',
     category: 'premium',
-    quantity: '1 lb'
+    quantity: '1 lb',
+    calories: 350
   },
   {
     id: 'Samsa',
@@ -59,7 +64,8 @@ const menuItems: MenuItem[] = [
     price: 9.99,
     image: 'https://eurasianbowl.s3.us-east-1.amazonaws.com/salads/samsa.jpg',
     category: 'healthy',
-    quantity: '5 pieces'
+    quantity: '5 pieces',
+    calories: 450
   },
   // {
   //   id: 'test',
@@ -289,7 +295,7 @@ export default function Home() {
             <p>Discover the perfect blend of crisp vegetables, premium ingredients, and homemade dressings crafted by mom&apos;s skilled hands.</p>
             <div className="hero-delivery">
               <i className="fas fa-truck"></i>
-              <span>Free Delivery in SC:<br></br> Spartanburg, Greer, Greenville,Inman, Lyman, Cowpens, Bouling Springs, Duncan, Union, Greenwood, Laurens, Moore</span>
+              <span>Free Delivery in SC:<br></br> Spartanburg, Greer, Greenville, Inman, Lyman, Cowpens, Bouling Springs, Duncan, Union, Greenwood, Laurens, Moore</span>
             </div>
          
             <div className="hero-buttons">
@@ -329,9 +335,15 @@ export default function Home() {
                 <div className="menu-content">
                   <h3>{item.name}</h3>
                   <p>{item.description}</p>
-                  <div className="menu-quantity">
-                    <i className="fas fa-weight-hanging"></i>
-                    <span>{item.quantity}</span>
+                  <div className="menu-info">
+                    <div className="menu-quantity">
+                      <i className="fas fa-weight-hanging"></i>
+                      <span>{item.quantity}</span>
+                    </div>
+                    <div className="menu-calories">
+                      <i className="fas fa-fire"></i>
+                      <span>{item.calories} cal</span>
+                    </div>
                   </div>
                   <div className="price">${item.price.toFixed(2)}</div>
                   <button
