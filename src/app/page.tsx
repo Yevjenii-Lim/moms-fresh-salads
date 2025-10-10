@@ -83,6 +83,8 @@ export default function Home() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [showAddedNotification, setShowAddedNotification] = useState(false);
+  const [addedItemName, setAddedItemName] = useState('');
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
     email: '',
@@ -114,6 +116,13 @@ export default function Home() {
         itemQuantity: item.quantity // Store the portion size separately
       }];
     });
+
+    // Show notification
+    setAddedItemName(item.name);
+    setShowAddedNotification(true);
+    setTimeout(() => {
+      setShowAddedNotification(false);
+    }, 2000);
   };
 
   const removeFromCart = (itemId: string) => {
@@ -260,6 +269,14 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
+      {/* Added to Cart Notification */}
+      {showAddedNotification && (
+        <div className="added-notification">
+          <i className="fas fa-check-circle"></i>
+          <span>{addedItemName} added to cart!</span>
+        </div>
+      )}
+
       {/* Navigation */}
       <nav className={`navbar ${showCheckout ? 'hidden' : ''}`}>
         <div className="nav-container">
@@ -439,21 +456,6 @@ export default function Home() {
                   <div>
                     {cart.map((item) => (
                       <div key={item.id} className="cart-item">
-                        <div className="cart-item-image">
-                          {item.image.startsWith('http') ? (
-                            <Image 
-                              src={item.image} 
-                              alt={item.name} 
-                              width={60} 
-                              height={60}
-                              className="rounded-lg object-cover"
-                            />
-                          ) : (
-                            <div className="text-2xl flex items-center justify-center w-15 h-15">
-                              {item.image}
-                            </div>
-                          )}
-                        </div>
                         <div className="cart-item-info">
                           <div className="cart-item-name">{item.name}</div>
                           <div className="cart-item-price">${item.price.toFixed(2)} each</div>
@@ -462,6 +464,7 @@ export default function Home() {
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
                             className="quantity-btn"
+                            disabled={item.quantity <= 1}
                           >
                             -
                           </button>
