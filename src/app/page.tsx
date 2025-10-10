@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 
 interface MenuItem {
@@ -148,7 +148,14 @@ export default function Home() {
     const discount = paymentMethod === 'cash' ? subtotal * 0.05 : 0; // 5% discount for cash
     const discountedSubtotal = subtotal - discount;
     const tax = discountedSubtotal * 0.08; // 8% tax on discounted amount
-    return { subtotal, discount, tax, total: discountedSubtotal + tax };
+    let total = discountedSubtotal + tax;
+    
+    // Round to nearest dollar for cash payments (no cents)
+    if (paymentMethod === 'cash') {
+      total = Math.round(total);
+    }
+    
+    return { subtotal, discount, tax, total };
   };
 
   const processPayment = async () => {
@@ -252,6 +259,7 @@ export default function Home() {
     alert(message);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);

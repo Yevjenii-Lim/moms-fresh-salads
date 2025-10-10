@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
-import TelegramBot from 'node-telegram-bot-api';
 import { config } from '../../../config/keys';
 import { addWebhookLog } from '../webhook-logs/route';
 

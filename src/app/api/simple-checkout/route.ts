@@ -10,6 +10,7 @@ const stripe = new Stripe(config.stripe.secretKey, {
   httpClient: Stripe.createFetchHttpClient(),
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function POST(request: NextRequest) {
   try {
     console.log('🧪 Simple checkout test started');

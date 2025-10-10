@@ -36,7 +36,7 @@ ${customerInfo.instructions ? `📝 *Instructions:* ${customerInfo.instructions}
 • *Total: $${total.toFixed(2)}*
 
 🛍️ *Items:*
-${items.map((item: any) => `• ${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`).join('\n')}
+${items.map((item: { id: string; name: string; price: number; quantity: number }) => `• ${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`).join('\n')}
 
 ⏰ *Time:* ${new Date().toLocaleString()}
     `.trim();
