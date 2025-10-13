@@ -9,9 +9,11 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.908.0",
     "@aws-sdk/client-ses": "^3.901.0",
     "@aws-sdk/client-ssm": "^3.901.0",
     "@aws-sdk/credential-provider-node": "^3.901.0",
+    "@aws-sdk/lib-dynamodb": "^3.908.0",
     "@stripe/stripe-js": "^8.0.0",
     "@types/nodemailer": "^7.0.2",
     "lucide-react": "^0.545.0",

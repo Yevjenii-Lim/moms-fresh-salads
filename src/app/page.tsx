@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 
 interface MenuItem {
-  id: string;
+  id: number;
   name: string;
   description: string;
   price: number;
@@ -15,7 +15,7 @@ interface MenuItem {
 }
 
 interface CartItem {
-  id: string;
+  id: number;
   name: string;
   description: string;
   price: number;
@@ -26,9 +26,10 @@ interface CartItem {
   calories: number;
 }
 
-const menuItems: MenuItem[] = [
+// Fallback menu data in case API fails
+const fallbackMenuItems: MenuItem[] = [
   {
-    id: 'caesar',
+    id: 1,
     name: 'Classic Korean Carrot Salad',
     description: 'Spicy, tangy shredded carrots with garlic and chili oil, a crisp and flavorful salad loved across Eastern Europe.',
     price: 9.99,
@@ -38,7 +39,7 @@ const menuItems: MenuItem[] = [
     calories: 200
   },
   {
-    id: 'greek',
+    id: 2,
     name: 'Cabbage & Cucumber Salad',
     description: 'Light and crunchy mix of shredded cabbage, fresh cucumber, and dill, tossed in a simple tangy dressing for a refreshing taste.',
     price: 9.99,
@@ -48,7 +49,7 @@ const menuItems: MenuItem[] = [
     calories: 150
   },
   {
-    id: 'Funchoza',
+    id: 3,
     name: 'Funchoza Salad',
     description: 'A colorful noodle salad with glass noodles, tender beef, fresh vegetables, and herbs tossed in a savory soy-garlic dressing. Light, flavorful, and full of texture.',
     price: 11.99,
@@ -58,7 +59,7 @@ const menuItems: MenuItem[] = [
     calories: 350
   },
   {
-    id: 'Samsa',
+    id: 4,
     name: 'Samsa',
     description: 'Flaky golden pastries filled with seasoned meat and onions, baked to perfection for a crisp outside and juicy, savory inside. A classic Central Asian favorite.',
     price: 9.99,
@@ -66,19 +67,12 @@ const menuItems: MenuItem[] = [
     category: 'healthy',
     quantity: '5 pieces',
     calories: 450
-  },
-  // {
-  //   id: 'test',
-  //   name: '🧪 Test Payment Item',
-  //   description: 'This is a test item for payment system testing. Perfect for verifying Stripe integration and email confirmations!',
-  //   price: 0.50,
-  //   image: '🧪',
-  //   category: 'test',
-  //   quantity: '1 test'
-  // }
+  }
 ];
 
 export default function Home() {
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(fallbackMenuItems);
+  const [menuLoading, setMenuLoading] = useState(true);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -101,6 +95,32 @@ export default function Home() {
     address: false
   });
 
+  // Fetch menu items from DynamoDB on component mount
+  useEffect(() => {
+    const fetchMenuItems = async () => {
+      try {
+        console.log('🍽️ Fetching menu items from API...');
+        const response = await fetch('/api/menu');
+        const data = await response.json();
+        
+        if (response.ok && data.items) {
+          console.log(`✅ Loaded ${data.items.length} menu items from DynamoDB`);
+          setMenuItems(data.items);
+        } else {
+          console.warn('⚠️ Failed to fetch menu items, using fallback data');
+          setMenuItems(fallbackMenuItems);
+        }
+      } catch (error) {
+        console.error('❌ Error fetching menu items:', error);
+        console.log('🔄 Using fallback menu data');
+        setMenuItems(fallbackMenuItems);
+      } finally {
+        setMenuLoading(false);
+      }
+    };
+
+    fetchMenuItems();
+  }, []);
 
   const addToCart = (item: MenuItem) => {
     setCart(prev => {
@@ -127,11 +147,11 @@ export default function Home() {
     }, 2000);
   };
 
-  const removeFromCart = (itemId: string) => {
+  const removeFromCart = (itemId: number) => {
     setCart(prev => prev.filter(item => item.id !== itemId));
   };
 
-  const updateQuantity = (itemId: string, quantity: number) => {
+  const updateQuantity = (itemId: number, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(itemId);
       return;
@@ -361,8 +381,13 @@ export default function Home() {
         <div className="container">
           <h2>Our Signature Salads</h2>
           <div className="menu-grid">
-            {menuItems.map((item) => (
-              <div key={item.id} className={`menu-item ${item.id === 'test' ? 'test-item' : ''}`}>
+            {menuLoading ? (
+              <div className="loading-message">
+                <p>Loading fresh menu items...</p>
+              </div>
+            ) : (
+              menuItems.map((item) => (
+              <div key={item.id} className={`menu-item ${item.id === 1000 ? 'test-item' : ''}`}>
                 <div className="menu-image">
                   {item.image.startsWith('http') ? (
                     <Image 
@@ -397,11 +422,12 @@ export default function Home() {
                     className="btn btn-add-to-cart"
                   >
                     <i className="fas fa-plus"></i>
-                    {item.id === 'test' ? 'Test Payment' : 'Add to Cart'}
+                    {item.id === 1000 ? 'Test Payment' : 'Add to Cart'}
                   </button>
                 </div>
               </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </section>

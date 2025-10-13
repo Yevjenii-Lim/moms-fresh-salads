@@ -21,6 +21,12 @@ export const config = {
     sender: process.env.GMAIL_USER || decodeKey('eWV2aGVuaWkubGltMjdAZ21haWwuY29t')
   },
   
+  // DynamoDB configuration
+  dynamodb: {
+    region: process.env.AWS_REGION || 'us-east-1',
+    tableName: process.env.DYNAMODB_MENU_TABLE_NAME || 'salads'
+  },
+  
   // Environment check
   isProduction: process.env.NODE_ENV === 'production',
   hasValidStripeKey: (process.env.STRIPE_SECRET_KEY || decodeKey('c2tfdGVzdF81MVNGZldxSG5WakJWSWZ1b3Rsb3JWRURmNW92eTIxWTZXcHdUNjlhTEliRERseHVsWjVFd3NQYjNmbVV2b3BNZndyY3B5VlVpUzY2b0xSMVVzN1p5VUVOVzAwWkZSTDkyR1UK')).startsWith('sk_'),
