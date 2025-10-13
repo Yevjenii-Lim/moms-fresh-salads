@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     GMAIL_APP_PASSWORD: process.env.GMAIL_APP_PASSWORD,
     TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
     TELEGRAM_CHAT_ID: process.env.TELEGRAM_CHAT_ID,
-    AWS_REGION: process.env.AWS_REGION,
+    AWS_REGION: process.env.REGION,
     DYNAMODB_MENU_TABLE_NAME: process.env.DYNAMODB_MENU_TABLE_NAME,
   },
   images: {

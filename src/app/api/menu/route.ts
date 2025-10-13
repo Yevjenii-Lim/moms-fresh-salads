@@ -38,14 +38,14 @@ export async function GET() {
     }
 
     // Transform DynamoDB items to match our MenuItem interface
-    const menuItems: MenuItem[] = result.Items.map((item: any) => ({
+    const menuItems: MenuItem[] = result.Items.map((item: Record<string, unknown>) => ({
       id: Number(item.id), // Convert string id from DynamoDB to number
-      name: item.name || '',
-      description: item.description || '',
+      name: (item.name as string) || '',
+      description: (item.description as string) || '',
       price: Number(item.price) || 0,
-      image: item.image || '',
-      category: item.category || 'classic',
-      quantity: item.quantity || '1 lb',
+      image: (item.image as string) || '',
+      category: (item.category as string) || 'classic',
+      quantity: (item.quantity as string) || '1 lb',
       calories: Number(item.calories) || 0
     }));
 
