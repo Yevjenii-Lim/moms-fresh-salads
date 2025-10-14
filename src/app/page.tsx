@@ -165,17 +165,21 @@ export default function Home() {
 
   const getTotalPrice = () => {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const discount = paymentMethod === 'cash' ? subtotal * 0.05 : 0; // 5% discount for cash
-    const discountedSubtotal = subtotal - discount;
-    const tax = discountedSubtotal * 0.08; // 8% tax on discounted amount
-    let total = discountedSubtotal + tax;
     
-    // Round to nearest dollar for cash payments (no cents)
     if (paymentMethod === 'cash') {
-      total = Math.round(total);
+      // Cash: Just the raw price, no discount, no tax
+      return { 
+        subtotal, 
+        discount: 0, 
+        tax: 0, 
+        total: subtotal 
+      };
+    } else {
+      // Card: Normal calculation with tax
+      const tax = subtotal * 0.08; // 8% tax
+      const total = subtotal + tax;
+      return { subtotal, discount: 0, tax, total };
     }
-    
-    return { subtotal, discount, tax, total };
   };
 
   const processPayment = async () => {
@@ -650,7 +654,7 @@ export default function Home() {
                         }`}
                       >
                         <i className="fas fa-money-bill-wave mr-2"></i>
-                        Pay Cash (5% off)
+                        Pay Cash
                       </button>
                     </div>
                   </div>
@@ -661,19 +665,15 @@ export default function Home() {
                         <span>Subtotal:</span>
                         <span>${getTotalPrice().subtotal.toFixed(2)}</span>
                       </div>
-                      {paymentMethod === 'cash' && getTotalPrice().discount > 0 && (
-                        <div className="flex justify-between text-green-600">
-                          <span>Cash Discount (5%):</span>
-                          <span>-${getTotalPrice().discount.toFixed(2)}</span>
+                      {paymentMethod === 'card' && (
+                        <div className="flex justify-between">
+                          <span>Tax:</span>
+                          <span>${getTotalPrice().tax.toFixed(2)}</span>
                         </div>
                       )}
-                      <div className="flex justify-between">
-                        <span>Tax:</span>
-                        <span>${getTotalPrice().tax.toFixed(2)}</span>
-                      </div>
                       <div className="flex justify-between font-bold text-lg">
                         <span>Total:</span>
-                        <span>${getTotalPrice().total.toFixed(2)}</span>
+                        <span>${paymentMethod === 'cash' ? getTotalPrice().total.toFixed(0) : getTotalPrice().total.toFixed(2)}</span>
                       </div>
                     </div>
                     
@@ -685,7 +685,7 @@ export default function Home() {
                       {paymentMethod === 'cash' ? (
                         <>
                           <span>💵</span>
-                          <span>Place Order (Cash): ${getTotalPrice().total.toFixed(2)}</span>
+                          <span>Place Order (Cash): ${getTotalPrice().total.toFixed(0)}</span>
                         </>
                       ) : (
                         <>
