@@ -365,7 +365,7 @@ export default function Home() {
             <p>Discover the perfect blend of crisp vegetables, premium ingredients, and homemade dressings crafted by mom&apos;s skilled hands.</p>
             <div className="hero-delivery">
               <i className="fas fa-truck"></i>
-              <span>Free Delivery in SC:<br></br> Spartanburg, Greer, Greenville, Inman, Lyman, Cowpens, Bouling Springs, Duncan, Union, Greenwood, Laurens, Moore</span>
+              <span>Free Delivery in SC:<br></br> Spartanburg, Greer, Greenville, Inman, Lyman, Cowpens, Boiling Springs, Duncan, Union, Greenwood, Laurens, Moore</span>
             </div>
          
             <div className="hero-buttons">
