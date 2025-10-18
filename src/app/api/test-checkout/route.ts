@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Test basic Stripe import
-    const Stripe = require('stripe');
+    const Stripe = (await import('stripe')).default;
     console.log('✅ Stripe import successful');
 
     // Test Stripe initialization
@@ -33,6 +33,10 @@ export async function POST(request: NextRequest) {
       apiVersion: '2025-09-30.clover',
     });
     console.log('✅ Stripe client initialized');
+    
+    // Test basic Stripe functionality
+    const account = await stripe.accounts.retrieve();
+    console.log('✅ Stripe account access successful:', account.id);
 
     return NextResponse.json({ 
       success: true, 
