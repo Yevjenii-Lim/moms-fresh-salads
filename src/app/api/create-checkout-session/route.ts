@@ -99,7 +99,6 @@ export async function POST(request: NextRequest) {
       customerAddress: customerInfo.address,
       specialInstructions: customerInfo.instructions || '',
       // Store only essential item info to stay under 500 char limit
-      items: items.map(item => `${item.quantity}x${item.id}`).join(','),
       orderSummary: items.map((item: CartItem) =>
         `${item.quantity}x ${item.name}`
       ).join('|'),
@@ -113,7 +112,6 @@ export async function POST(request: NextRequest) {
     console.log('📊 Metadata size check:', {
       metadataLength: metadataString.length,
       metadataPreview: metadataString.substring(0, 200) + '...',
-      itemsField: metadata.items,
       orderSummaryField: metadata.orderSummary
     });
     

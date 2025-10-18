@@ -13,7 +13,6 @@ interface OrderData {
     address: string;
     instructions: string;
   };
-  items: string;
   orderSummary: string;
   subtotal: string;
   tax: string;
@@ -228,7 +227,6 @@ export async function POST(request: NextRequest) {
           address: session.metadata?.customerAddress || '',
           instructions: session.metadata?.specialInstructions || ''
         },
-        items: session.metadata?.items || '',
         orderSummary: session.metadata?.orderSummary || '',
         subtotal: session.metadata?.subtotal || '0',
         tax: session.metadata?.tax || '0',
