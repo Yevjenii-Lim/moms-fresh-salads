@@ -1,33 +1,36 @@
-import { NextResponse } from 'next/server';
-import { config } from '../../../config/keys';
+import { NextRequest, NextResponse } from 'next/server';
+import { addWebhookLog } from '../webhook-logs/route';
 
-export async function GET() {
+export async function POST(request: NextRequest) {
   try {
     console.log('🧪 Webhook test endpoint called');
+    addWebhookLog('🧪 Webhook test endpoint called');
     
-    const testResult = {
-      status: 'webhook-test',
+    const body = await request.text();
+    console.log('📦 Request body length:', body.length);
+    addWebhookLog(`📦 Request body length: ${body.length}`);
+    
+    const headers = Object.fromEntries(request.headers.entries());
+    console.log('📋 Request headers:', headers);
+    addWebhookLog(`📋 Request headers: ${JSON.stringify(headers)}`);
+    
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Webhook test successful',
       timestamp: new Date().toISOString(),
-      config: {
-        webhookSecret: config.stripe.webhookSecret ? 'present' : 'missing',
-        webhookSecretPreview: config.stripe.webhookSecret ? config.stripe.webhookSecret.substring(0, 8) + '...' : 'missing',
-        emailUser: config.email.user ? 'present' : 'missing',
-        emailPassword: config.email.password ? 'present' : 'missing',
-        hasValidWebhookSecret: config.hasValidWebhookSecret,
-        hasValidEmailConfig: config.hasValidEmailConfig
-      }
-    };
+      bodyLength: body.length,
+      hasStripeSignature: !!headers['stripe-signature']
+    });
 
-    console.log('✅ Webhook test result:', testResult);
-    
-    return NextResponse.json(testResult);
   } catch (error) {
     console.error('❌ Webhook test error:', error);
+    addWebhookLog(`❌ Webhook test error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    
     return NextResponse.json(
-      {
-        status: 'error',
-        error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
+      { 
+        success: false,
+        error: 'Webhook test failed',
+        details: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
     );
