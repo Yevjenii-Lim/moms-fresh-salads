@@ -122,10 +122,11 @@ export async function POST(request: NextRequest) {
         customerPhone: customerInfo.phone,
         customerAddress: customerInfo.address,
         specialInstructions: customerInfo.instructions || '',
-        items: JSON.stringify(items),
+        // Store only essential item info to stay under 500 char limit
+        items: items.map(item => `${item.quantity}x${item.id}`).join(','),
         orderSummary: items.map((item: CartItem) =>
-          `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`
-        ).join(' | '),
+          `${item.quantity}x ${item.name}`
+        ).join('|'),
         subtotal: subtotal.toFixed(2),
         tax: tax.toFixed(2),
         total: total.toFixed(2),
