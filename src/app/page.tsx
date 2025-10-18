@@ -283,6 +283,52 @@ export default function Home() {
     alert(message);
   };
 
+  // Test function to debug checkout issues
+  const testCheckout = async () => {
+    try {
+      console.log('🧪 Testing checkout with sample data...');
+      const testData = {
+        items: [
+          {
+            id: 1,
+            name: 'Test Item',
+            description: 'Test Description',
+            price: 10.00,
+            category: 'test',
+            quantity: 1,
+            itemQuantity: '1 lb',
+            calories: 100
+          }
+        ],
+        customerInfo: {
+          name: 'Test Customer',
+          email: 'test@example.com',
+          phone: '123-456-7890',
+          address: '123 Test St',
+          instructions: ''
+        },
+        subtotal: 10.00,
+        tax: 0.80,
+        total: 10.80
+      };
+
+      const response = await fetch('/api/test-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(testData),
+      });
+
+      const result = await response.json();
+      console.log('🧪 Test result:', result);
+      alert(`Test result: ${result.success ? 'SUCCESS' : 'FAILED'}\n${JSON.stringify(result, null, 2)}`);
+    } catch (error) {
+      console.error('🧪 Test error:', error);
+      alert(`Test error: ${error}`);
+    }
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -693,6 +739,15 @@ export default function Home() {
                           <span>Pay by Card: ${getTotalPrice().total.toFixed(2)}</span>
                         </>
                       )}
+                    </button>
+                    
+                    {/* Temporary test button for debugging */}
+                    <button
+                      type="button"
+                      onClick={testCheckout}
+                      className="w-full bg-yellow-500 text-white py-2 text-sm rounded-lg hover:bg-yellow-600 transition-colors mt-2"
+                    >
+                      🧪 Test Checkout API
                     </button>
                   </div>
                 </form>
