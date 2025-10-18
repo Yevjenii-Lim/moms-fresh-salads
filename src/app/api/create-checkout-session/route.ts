@@ -63,12 +63,24 @@ export async function POST(request: NextRequest) {
       itemsCount: items.length,
       items: items.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity })),
       customerEmail: customerInfo.email,
+      subtotal: subtotal,
+      tax: tax,
       total: total
     });
 
+    // Validate required data
+    if (!items || items.length === 0) {
+      throw new Error('No items in cart');
+    }
+    if (!customerInfo || !customerInfo.email) {
+      throw new Error('Customer information missing');
+    }
+
     // Create Stripe checkout session
     console.log('🎯 Creating Stripe checkout session...');
-    const session = await stripe.checkout.sessions.create({
+    
+    try {
+      const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card', 'link'],
       payment_method_options: {
         card: {
@@ -112,26 +124,30 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Log order details for debugging
-    console.log('Order created:', {
-      sessionId: session.id,
-      customerEmail: customerInfo.email,
-      customerName: customerInfo.name,
-      customerPhone: customerInfo.phone,
-      amountTotal: total,
-      orderItems: items,
-      orderSummary: items.map((item: CartItem) =>
-        `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`
-      ).join(' | '),
-      subtotal: subtotal.toFixed(2),
-      tax: tax.toFixed(2),
-      total: total.toFixed(2)
-    });
+      // Log order details for debugging
+      console.log('Order created:', {
+        sessionId: session.id,
+        customerEmail: customerInfo.email,
+        customerName: customerInfo.name,
+        customerPhone: customerInfo.phone,
+        amountTotal: total,
+        orderItems: items,
+        orderSummary: items.map((item: CartItem) =>
+          `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`
+        ).join(' | '),
+        subtotal: subtotal.toFixed(2),
+        tax: tax.toFixed(2),
+        total: total.toFixed(2)
+      });
 
-    // Emails will be sent via webhook after payment completion
-    console.log('✅ Checkout session created - emails will be sent via webhook after payment');
+      // Emails will be sent via webhook after payment completion
+      console.log('✅ Checkout session created - emails will be sent via webhook after payment');
 
-    return NextResponse.json({ url: session.url });
+      return NextResponse.json({ url: session.url });
+    } catch (stripeError) {
+      console.error('❌ Stripe API Error:', stripeError);
+      throw new Error(`Stripe error: ${stripeError instanceof Error ? stripeError.message : 'Unknown Stripe error'}`);
+    }
   } catch (error) {
     console.error('❌ Error creating checkout session:', error);
     console.error('❌ Error details:', {
