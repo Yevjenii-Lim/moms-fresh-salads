@@ -162,9 +162,9 @@ export async function POST(request: NextRequest) {
         message: stripeError instanceof Error ? stripeError.message : 'Unknown error',
         type: stripeError instanceof Error ? stripeError.constructor.name : typeof stripeError,
         stack: stripeError instanceof Error ? stripeError.stack : undefined,
-        stripeErrorType: (stripeError as any)?.type,
-        stripeErrorCode: (stripeError as any)?.code,
-        stripeErrorParam: (stripeError as any)?.param
+        stripeErrorType: (stripeError as Record<string, unknown>)?.type,
+        stripeErrorCode: (stripeError as Record<string, unknown>)?.code,
+        stripeErrorParam: (stripeError as Record<string, unknown>)?.param
       });
       throw new Error(`Stripe error: ${stripeError instanceof Error ? stripeError.message : 'Unknown Stripe error'}`);
     }
