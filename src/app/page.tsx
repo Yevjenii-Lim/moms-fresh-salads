@@ -283,6 +283,25 @@ export default function Home() {
     alert(message);
   };
 
+  // Test Telegram notification
+  const testTelegram = async () => {
+    try {
+      const response = await fetch('/api/test-telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result = await response.json();
+      console.log('🧪 Telegram test result:', result);
+      alert(`Telegram test: ${result.success ? 'SUCCESS' : 'FAILED'}\n${JSON.stringify(result, null, 2)}`);
+    } catch (error) {
+      console.error('🧪 Telegram test error:', error);
+      alert(`Telegram test error: ${error}`);
+    }
+  };
+
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -470,6 +489,14 @@ export default function Home() {
                 <i className="fas fa-envelope"></i>
                 <span>yevhenii.lim27@gmail.com</span>
               </div>
+              
+              {/* Temporary test button for Telegram */}
+              <button
+                onClick={testTelegram}
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors mt-4"
+              >
+                🧪 Test Telegram Notification
+              </button>
      
             
               <div className="hours">

@@ -1,30 +1,30 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET() {
+export async function POST(request: NextRequest) {
   try {
+    console.log('🧪 Testing Telegram notification...');
+    
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
 
-    console.log('Bot Token:', botToken ? 'Present' : 'Missing');
-    console.log('Chat ID:', chatId);
-
     if (!botToken || !chatId) {
-      return NextResponse.json({
-        error: 'Missing credentials',
+      console.warn('⚠️ Telegram credentials not configured');
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Telegram credentials not configured',
         botToken: botToken ? 'present' : 'missing',
-        chatId: chatId || 'missing'
+        chatId: chatId ? 'present' : 'missing'
       });
     }
 
     const testMessage = `
-🧪 *Test Message*
+🧪 *Test Telegram Notification*
 
-This is a test message from Mom's Fresh Salads.
-
-⏰ Time: ${new Date().toLocaleString()}
-
-If you see this, Telegram notifications are working! ✅
-    `.trim();
+✅ Telegram bot is working!
+📅 Time: ${new Date().toLocaleString()}
+🔧 Bot Token: ${botToken.substring(0, 8)}...
+💬 Chat ID: ${chatId}
+    `;
 
     const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: 'POST',
@@ -34,32 +34,37 @@ If you see this, Telegram notifications are working! ✅
       body: JSON.stringify({
         chat_id: chatId,
         text: testMessage,
-        parse_mode: 'Markdown',
+        parse_mode: 'Markdown'
       }),
     });
 
-    const data = await response.json();
+    const result = await response.json();
 
-    if (response.ok) {
-      return NextResponse.json({
-        success: true,
-        message: 'Test message sent!',
-        chatId: chatId,
-        response: data
+    if (response.ok && result.ok) {
+      console.log('✅ Test Telegram notification sent successfully');
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Test notification sent successfully',
+        telegramResponse: result
       });
     } else {
-      return NextResponse.json({
-        success: false,
-        error: data.description || 'Failed to send',
-        chatId: chatId,
-        response: data
-      }, { status: 400 });
+      console.error('❌ Telegram API error:', result);
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Telegram API error',
+        telegramResponse: result
+      }, { status: 500 });
     }
+
   } catch (error) {
-    return NextResponse.json({
-      error: 'Server error',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    console.error('❌ Test Telegram error:', error);
+    return NextResponse.json(
+      { 
+        success: false,
+        error: 'Test failed',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    );
   }
 }
-
