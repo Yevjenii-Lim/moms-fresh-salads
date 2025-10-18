@@ -91,6 +91,37 @@ export async function POST(request: NextRequest) {
     // Create Stripe checkout session
     console.log('🎯 Creating Stripe checkout session...');
     
+    // Debug metadata size
+    const metadata = {
+      orderId: Date.now().toString(),
+      customerName: customerInfo.name,
+      customerPhone: customerInfo.phone,
+      customerAddress: customerInfo.address,
+      specialInstructions: customerInfo.instructions || '',
+      // Store only essential item info to stay under 500 char limit
+      items: items.map(item => `${item.quantity}x${item.id}`).join(','),
+      orderSummary: items.map((item: CartItem) =>
+        `${item.quantity}x ${item.name}`
+      ).join('|'),
+      subtotal: subtotal.toFixed(2),
+      tax: tax.toFixed(2),
+      total: total.toFixed(2),
+      itemCount: items.reduce((sum: number, item: CartItem) => sum + item.quantity, 0)
+    };
+    
+    const metadataString = JSON.stringify(metadata);
+    console.log('📊 Metadata size check:', {
+      metadataLength: metadataString.length,
+      metadataPreview: metadataString.substring(0, 200) + '...',
+      itemsField: metadata.items,
+      orderSummaryField: metadata.orderSummary
+    });
+    
+    if (metadataString.length > 500) {
+      console.error('❌ Metadata too large:', metadataString.length, 'characters');
+      throw new Error(`Metadata too large: ${metadataString.length} characters (max 500)`);
+    }
+    
     try {
       const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card', 'link'],
@@ -116,22 +147,7 @@ export async function POST(request: NextRequest) {
       success_url: `https://eurasianbowl.com/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `https://eurasianbowl.com/cancel`,
       customer_email: customerInfo.email,
-      metadata: {
-        orderId: Date.now().toString(),
-        customerName: customerInfo.name,
-        customerPhone: customerInfo.phone,
-        customerAddress: customerInfo.address,
-        specialInstructions: customerInfo.instructions || '',
-        // Store only essential item info to stay under 500 char limit
-        items: items.map(item => `${item.quantity}x${item.id}`).join(','),
-        orderSummary: items.map((item: CartItem) =>
-          `${item.quantity}x ${item.name}`
-        ).join('|'),
-        subtotal: subtotal.toFixed(2),
-        tax: tax.toFixed(2),
-        total: total.toFixed(2),
-        itemCount: items.reduce((sum: number, item: CartItem) => sum + item.quantity, 0)
-      },
+      metadata: metadata,
       phone_number_collection: {
         enabled: true,
       },
