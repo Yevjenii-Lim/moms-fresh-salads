@@ -20,13 +20,15 @@ console.log('Configuration check:', {
 });
 
 interface CartItem {
-  id: string;
+  id: number;
   name: string;
   description: string;
   price: number;
   image?: string;
   category: string;
   quantity: number;
+  itemQuantity: string;
+  calories: number;
 }
 
 interface CustomerInfo {
