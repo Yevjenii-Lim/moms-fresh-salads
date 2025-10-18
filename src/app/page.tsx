@@ -283,44 +283,6 @@ export default function Home() {
     alert(message);
   };
 
-  // Test Telegram notification
-  const testTelegram = async () => {
-    try {
-      const response = await fetch('/api/test-telegram', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const result = await response.json();
-      console.log('🧪 Telegram test result:', result);
-      alert(`Telegram test: ${result.success ? 'SUCCESS' : 'FAILED'}\n${JSON.stringify(result, null, 2)}`);
-    } catch (error) {
-      console.error('🧪 Telegram test error:', error);
-      alert(`Telegram test error: ${error}`);
-    }
-  };
-
-  // Test webhook endpoint
-  const testWebhook = async () => {
-    try {
-      const response = await fetch('/api/webhook-test', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ test: 'data' }),
-      });
-
-      const result = await response.json();
-      console.log('🧪 Webhook test result:', result);
-      alert(`Webhook test: ${result.success ? 'SUCCESS' : 'FAILED'}\n${JSON.stringify(result, null, 2)}`);
-    } catch (error) {
-      console.error('🧪 Webhook test error:', error);
-      alert(`Webhook test error: ${error}`);
-    }
-  };
 
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -510,21 +472,6 @@ export default function Home() {
                 <span>yevhenii.lim27@gmail.com</span>
               </div>
               
-              {/* Temporary test buttons for debugging */}
-              <div className="mt-4 space-y-2">
-                <button
-                  onClick={testTelegram}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors w-full"
-                >
-                  🧪 Test Telegram Notification
-                </button>
-                <button
-                  onClick={testWebhook}
-                  className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors w-full"
-                >
-                  🧪 Test Webhook Endpoint
-                </button>
-              </div>
      
             
               <div className="hours">
