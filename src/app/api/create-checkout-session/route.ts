@@ -61,8 +61,20 @@ export async function POST(request: NextRequest) {
 
     console.log('📦 Request data received:', {
       itemsCount: items.length,
-      items: items.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity })),
+      items: items.map(item => ({ 
+        id: item.id, 
+        name: item.name, 
+        price: item.price, 
+        quantity: item.quantity,
+        description: item.description,
+        category: item.category,
+        itemQuantity: item.itemQuantity,
+        calories: item.calories
+      })),
       customerEmail: customerInfo.email,
+      customerName: customerInfo.name,
+      customerPhone: customerInfo.phone,
+      customerAddress: customerInfo.address,
       subtotal: subtotal,
       tax: tax,
       total: total
@@ -146,6 +158,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ url: session.url });
     } catch (stripeError) {
       console.error('❌ Stripe API Error:', stripeError);
+      console.error('❌ Stripe Error Details:', {
+        message: stripeError instanceof Error ? stripeError.message : 'Unknown error',
+        type: stripeError instanceof Error ? stripeError.constructor.name : typeof stripeError,
+        stack: stripeError instanceof Error ? stripeError.stack : undefined,
+        stripeErrorType: (stripeError as any)?.type,
+        stripeErrorCode: (stripeError as any)?.code,
+        stripeErrorParam: (stripeError as any)?.param
+      });
       throw new Error(`Stripe error: ${stripeError instanceof Error ? stripeError.message : 'Unknown Stripe error'}`);
     }
   } catch (error) {
