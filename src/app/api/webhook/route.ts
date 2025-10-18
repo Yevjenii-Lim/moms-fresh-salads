@@ -14,6 +14,7 @@ interface OrderData {
     instructions: string;
   };
   items: string;
+  orderSummary: string;
   subtotal: string;
   tax: string;
   total: string;
@@ -54,8 +55,8 @@ ${orderData.customerInfo.instructions ? `📝 *Instructions:* ${orderData.custom
 
 🛍️ *Order Details:*
 💰 *Total:* $${orderData.total}
-📋 *Items:* ${orderData.items}
-📊 *Order Summary:* ${orderData.subtotal} + ${orderData.tax} tax
+📋 *Items:* ${orderData.orderSummary}
+📊 *Breakdown:* $${orderData.subtotal} + $${orderData.tax} tax
 
 🆔 *Order ID:* ${orderData.sessionId}
 ⏰ *Time:* ${new Date().toLocaleString()}
@@ -118,8 +119,8 @@ async function sendOrderConfirmationEmail(orderData: OrderData) {
       <p><strong>Total:</strong> $${orderData.total}</p>
       
       <h3>Items:</h3>
-      <p>${orderData.items}</p>
-      <p><strong>Order Summary:</strong> ${orderData.subtotal} + ${orderData.tax} tax = ${orderData.total}</p>
+      <p>${orderData.orderSummary}</p>
+      <p><strong>Breakdown:</strong> $${orderData.subtotal} + $${orderData.tax} tax = $${orderData.total}</p>
       
       <p>Thank you for choosing Mom's Fresh Salads!</p>
     </div>
@@ -228,6 +229,7 @@ export async function POST(request: NextRequest) {
           instructions: session.metadata?.specialInstructions || ''
         },
         items: session.metadata?.items || '',
+        orderSummary: session.metadata?.orderSummary || '',
         subtotal: session.metadata?.subtotal || '0',
         tax: session.metadata?.tax || '0',
         total: session.metadata?.total || '0',
