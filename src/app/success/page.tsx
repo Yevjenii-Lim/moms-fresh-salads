@@ -1,74 +1,38 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { CheckCircle, ArrowLeft } from 'lucide-react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 
-function SuccessContent() {
-  const searchParams = useSearchParams();
-  const sessionId = searchParams.get('session_id');
-  const [, ] = useState<{id: string; amount: number} | null>(null);
-
+export default function SuccessPage() {
   useEffect(() => {
-    if (sessionId) {
-      // You can fetch order details from your API here
-      console.log('Payment successful for session:', sessionId);
-    }
-  }, [sessionId]);
+    // Clear cart after successful payment
+    localStorage.removeItem('cart');
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
-        <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">Payment Successful!</h1>
-        <p className="text-gray-600 mb-6">
-          Thank you for your order! We&apos;ve received your payment and will start preparing your fresh salad right away.
-        </p>
-        <div className="space-y-4">
-          <p className="text-sm text-gray-500">
-            Order ID: {sessionId || 'N/A'}
-          </p>
-          <p className="text-sm text-gray-500">
-            You&apos;ll receive a confirmation email shortly.
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="mb-8">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">Order Successful!</h1>
+          <p className="text-gray-600 mb-8">
+            Thank you for your order. We'll prepare your delicious salads and contact you soon!
           </p>
         </div>
-        <Link
-          href="/"
-          className="inline-flex items-center space-x-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors mt-6"
-        >
-          <ArrowLeft size={20} />
-          <span>Back to Menu</span>
-        </Link>
-      </div>
-    </div>
-  );
-}
-
-export default function SuccessPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Payment Successful!</h1>
-          <p className="text-gray-600 mb-6">
-            Thank you for your order! We&apos;ve received your payment and will start preparing your fresh salad right away.
-          </p>
-          <p className="text-sm text-gray-500">
-            Loading order details...
-          </p>
-          <Link
+        
+        <div className="space-y-4">
+          <Link 
             href="/"
-            className="inline-flex items-center space-x-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors mt-6"
+            className="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
           >
-            <ArrowLeft size={20} />
-            <span>Back to Menu</span>
+            Back to Menu
           </Link>
         </div>
       </div>
-    }>
-      <SuccessContent />
-    </Suspense>
+    </div>
   );
 }

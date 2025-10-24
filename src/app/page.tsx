@@ -76,24 +76,35 @@ export default function Home() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showCheckout, setShowCheckout] = useState(false);
   const [showAddedNotification, setShowAddedNotification] = useState(false);
   const [addedItemName, setAddedItemName] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'cash'>('card');
-  const [customerInfo, setCustomerInfo] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    instructions: ''
-  });
 
-  const [formErrors, setFormErrors] = useState({
-    name: false,
-    email: false,
-    phone: false,
-    address: false
-  });
+  // Load cart from localStorage on component mount
+  useEffect(() => {
+    const savedCart = localStorage.getItem('cart');
+    console.log('🛒 Loading cart from localStorage:', savedCart);
+    if (savedCart) {
+      const parsedCart = JSON.parse(savedCart);
+      console.log('🛒 Parsed cart:', parsedCart);
+      setCart(parsedCart);
+    }
+  }, []);
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    console.log('🛒 Cart changed:', cart);
+    if (cart.length > 0) {
+      localStorage.setItem('cart', JSON.stringify(cart));
+      console.log('🛒 Saved cart to localStorage');
+    } else {
+      // Only clear localStorage if cart is explicitly empty (not on initial load)
+      const savedCart = localStorage.getItem('cart');
+      if (savedCart && JSON.parse(savedCart).length > 0) {
+        localStorage.removeItem('cart');
+        console.log('🛒 Cleared cart from localStorage');
+      }
+    }
+  }, [cart]);
 
   // Fetch menu items from DynamoDB on component mount
   useEffect(() => {
@@ -163,121 +174,10 @@ export default function Home() {
     );
   };
 
-  const getTotalPrice = () => {
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
-    if (paymentMethod === 'cash') {
-      // Cash: Just the raw price, no discount, no tax
-      return { 
-        subtotal, 
-        discount: 0, 
-        tax: 0, 
-        total: subtotal 
-      };
-    } else {
-      // Card: Normal calculation with tax
-      const tax = subtotal * 0.03; // 3% tax
-      const total = subtotal + tax;
-      return { subtotal, discount: 0, tax, total };
-    }
+  const getCartTotal = () => {
+    return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   };
 
-  const processPayment = async () => {
-    // Reset errors
-    setFormErrors({
-      name: false,
-      email: false,
-      phone: false,
-      address: false
-    });
-
-    // Validate customer information
-    const errors = {
-      name: !customerInfo.name.trim(),
-      email: !customerInfo.email.trim(),
-      phone: !customerInfo.phone.trim(),
-      address: !customerInfo.address.trim()
-    };
-
-    // Email validation regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (customerInfo.email.trim() && !emailRegex.test(customerInfo.email)) {
-      errors.email = true;
-    }
-
-    // Check if any errors
-    if (Object.values(errors).some(error => error)) {
-      setFormErrors(errors);
-      
-      // Show specific error message
-      if (errors.name) alert('Please enter your name');
-      else if (errors.email) alert('Please enter a valid email address');
-      else if (errors.phone) alert('Please enter your phone number');
-      else if (errors.address) alert('Please enter your delivery address');
-      
-      return;
-    }
-    
-    const { subtotal, discount, tax, total } = getTotalPrice();
-    
-    // Handle cash payment
-    if (paymentMethod === 'cash') {
-      try {
-        const response = await fetch('/api/cash-order', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            items: cart,
-            customerInfo,
-            subtotal,
-            discount,
-            tax,
-            total
-          }),
-        });
-
-        if (response.ok) {
-          alert('Order received! We will contact you shortly to confirm. Total to pay in cash: $' + total.toFixed(2));
-          setCart([]);
-          setShowCheckout(false);
-          setCustomerInfo({ name: '', email: '', phone: '', address: '', instructions: '' });
-        } else {
-          alert('Failed to submit order. Please try again.');
-        }
-      } catch (error) {
-        console.error('Order failed:', error);
-        alert('Failed to submit order. Please try again.');
-      }
-      return;
-    }
-    
-    // Handle card payment
-    try {
-      const response = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          items: cart,
-          customerInfo,
-          subtotal,
-          tax,
-          total
-        }),
-      });
-
-      const { url } = await response.json();
-      if (url) {
-        window.location.href = url;
-      }
-    } catch (error) {
-      console.error('Payment failed:', error);
-      alert('Payment failed. Please try again.');
-    }
-  };
 
   const showNotification = (message: string) => {
     alert(message);
@@ -333,7 +233,7 @@ export default function Home() {
       )}
 
       {/* Navigation */}
-      <nav className={`navbar ${showCheckout ? 'hidden' : ''}`}>
+      <nav className="navbar">
         <div className="nav-container">
           <div className="nav-logo">
             <i className="fas fa-leaf"></i>
@@ -548,22 +448,18 @@ export default function Home() {
                   <div className="cart-total">
                     <div className="total-line">
                       <span>Subtotal:</span>
-                      <span>${getTotalPrice().subtotal.toFixed(2)}</span>
-                    </div>
-                    <div className="total-line">
-                      <span>Tax (8%):</span>
-                      <span>${getTotalPrice().tax.toFixed(2)}</span>
+                      <span>${getCartTotal().toFixed(2)}</span>
                     </div>
                     <div className="total-line total-final">
                       <span>Total:</span>
-                      <span>${getTotalPrice().total.toFixed(2)}</span>
+                      <span>${getCartTotal().toFixed(2)}</span>
                     </div>
                   </div>
                   <button
                     className="btn-checkout"
                     onClick={() => {
                       setIsCartOpen(false);
-                      setShowCheckout(true);
+                      window.location.href = '/checkout';
                     }}
                   >
                     <i className="fas fa-credit-card"></i>
@@ -576,8 +472,8 @@ export default function Home() {
         </div>
       )}
 
-      {/* Checkout Modal */}
-      {showCheckout && (
+      {/* Checkout Modal - REMOVED */}
+      {false && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setShowCheckout(false)} />
           <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md my-8">
@@ -666,7 +562,7 @@ export default function Home() {
                     <div className="space-y-2 mb-4">
                       <div className="flex justify-between">
                         <span>Subtotal:</span>
-                        <span>${getTotalPrice().subtotal.toFixed(2)}</span>
+                        <span>${getCartTotal().toFixed(2)}</span>
                       </div>
                       {paymentMethod === 'card' && (
                         <div className="flex justify-between">
@@ -676,7 +572,7 @@ export default function Home() {
                       )}
                       <div className="flex justify-between font-bold text-lg">
                         <span>Total:</span>
-                        <span>${paymentMethod === 'cash' ? getTotalPrice().total.toFixed(0) : getTotalPrice().total.toFixed(2)}</span>
+                        <span>${paymentMethod === 'cash' ? getTotalPrice().total.toFixed(0) : getCartTotal().toFixed(2)}</span>
                       </div>
                     </div>
                     
@@ -693,7 +589,7 @@ export default function Home() {
                       ) : (
                         <>
                           <span>💳</span>
-                          <span>Pay by Card: ${getTotalPrice().total.toFixed(2)}</span>
+                          <span>Pay by Card: ${getCartTotal().toFixed(2)}</span>
                         </>
                       )}
                     </button>
