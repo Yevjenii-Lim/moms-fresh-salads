@@ -22,7 +22,7 @@ export default function SuccessPage() {
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Order Successful!</h1>
           <p className="text-gray-600 mb-8">
-            Thank you for your order. We'll prepare your delicious salads and contact you soon!
+            Thank you for your order. We&apos;ll prepare your delicious salads and contact you soon!
           </p>
         </div>
         

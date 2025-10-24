@@ -36,8 +36,6 @@ export default function CheckoutPage() {
     instructions: ''
   });
   const [isProcessing, setIsProcessing] = useState(false);
-  const [showAddedNotification, setShowAddedNotification] = useState(false);
-  const [addedItemName, setAddedItemName] = useState('');
 
   // Load cart from localStorage on component mount
   useEffect(() => {
