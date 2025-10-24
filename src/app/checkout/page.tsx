@@ -94,8 +94,17 @@ export default function CheckoutPage() {
   };
 
   const handleCashOrder = async () => {
-    if (!customerInfo.name || !customerInfo.phone || !customerInfo.address) {
-      alert('Please fill in all required fields (Name, Phone, Address)');
+    // Validate required fields with specific error messages
+    if (!customerInfo.name?.trim()) {
+      alert('Please enter your name');
+      return;
+    }
+    if (!customerInfo.phone?.trim()) {
+      alert('Please enter your phone number');
+      return;
+    }
+    if (!customerInfo.address?.trim()) {
+      alert('Please enter your delivery address');
       return;
     }
 
@@ -137,8 +146,27 @@ export default function CheckoutPage() {
   };
 
   const handleCardPayment = async () => {
-    if (!customerInfo.name || !customerInfo.email || !customerInfo.phone || !customerInfo.address) {
-      alert('Please fill in all required fields (Name, Email, Phone, Address)');
+    // Validate required fields with specific error messages
+    if (!customerInfo.name?.trim()) {
+      alert('Please enter your name');
+      return;
+    }
+    if (!customerInfo.email?.trim()) {
+      alert('Please enter your email address');
+      return;
+    }
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(customerInfo.email)) {
+      alert('Please enter a valid email address (e.g., yourname@example.com)');
+      return;
+    }
+    if (!customerInfo.phone?.trim()) {
+      alert('Please enter your phone number');
+      return;
+    }
+    if (!customerInfo.address?.trim()) {
+      alert('Please enter your delivery address');
       return;
     }
 
