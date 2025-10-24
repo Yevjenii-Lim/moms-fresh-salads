@@ -6,7 +6,9 @@ import Link from 'next/link';
 export default function SuccessPage() {
   useEffect(() => {
     // Clear cart after successful payment
+    console.log('🎉 Payment successful - clearing cart from localStorage');
     localStorage.removeItem('cart');
+    console.log('✅ Cart cleared from localStorage');
   }, []);
 
   return (

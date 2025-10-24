@@ -123,7 +123,9 @@ export default function CheckoutPage() {
       
       if (result.success) {
         // Clear cart and redirect to success page
+        console.log('💵 Cash order successful - clearing cart from localStorage');
         localStorage.removeItem('cart');
+        console.log('✅ Cart cleared from localStorage');
         router.push('/success?type=cash');
       } else {
         alert(`Order failed: ${result.error}`);
@@ -357,7 +359,7 @@ export default function CheckoutPage() {
                       onChange={(e) => setPaymentMethod(e.target.value as 'card')}
                       className="mr-2"
                     />
-                    <span>Pay with Card (3% tax)</span>
+                    <span>Pay with Card</span>
                   </label>
                   <label className="flex items-center">
                     <input
@@ -368,7 +370,7 @@ export default function CheckoutPage() {
                       onChange={(e) => setPaymentMethod(e.target.value as 'cash')}
                       className="mr-2"
                     />
-                    <span>Pay Cash (No tax)</span>
+                    <span>Pay Cash</span>
                   </label>
                 </div>
               </div>

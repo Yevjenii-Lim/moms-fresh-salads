@@ -82,28 +82,17 @@ export default function Home() {
   // Load cart from localStorage on component mount
   useEffect(() => {
     const savedCart = localStorage.getItem('cart');
-    console.log('🛒 Loading cart from localStorage:', savedCart);
     if (savedCart) {
-      const parsedCart = JSON.parse(savedCart);
-      console.log('🛒 Parsed cart:', parsedCart);
-      setCart(parsedCart);
+      setCart(JSON.parse(savedCart));
     }
   }, []);
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
-    console.log('🛒 Cart changed:', cart);
     if (cart.length > 0) {
       localStorage.setItem('cart', JSON.stringify(cart));
-      console.log('🛒 Saved cart to localStorage');
-    } else {
-      // Only clear localStorage if cart is explicitly empty (not on initial load)
-      const savedCart = localStorage.getItem('cart');
-      if (savedCart && JSON.parse(savedCart).length > 0) {
-        localStorage.removeItem('cart');
-        console.log('🛒 Cleared cart from localStorage');
-      }
     }
+    // Don't clear localStorage when cart is empty - let other pages handle clearing
   }, [cart]);
 
   // Fetch menu items from DynamoDB on component mount
