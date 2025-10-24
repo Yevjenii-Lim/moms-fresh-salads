@@ -176,7 +176,7 @@ export default function Home() {
       };
     } else {
       // Card: Normal calculation with tax
-      const tax = subtotal * 0.08; // 8% tax
+      const tax = subtotal * 0.03; // 3% tax
       const total = subtotal + tax;
       return { subtotal, discount: 0, tax, total };
     }
