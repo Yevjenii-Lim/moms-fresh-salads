@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { items, customerInfo, subtotal, discount, tax, total } = await request.json();
+    const { items, customerInfo, subtotal, total } = await request.json();
 
     console.log('💵 Cash order received');
     console.log('Customer:', customerInfo);
@@ -27,13 +27,11 @@ export async function POST(request: NextRequest) {
 ${customerInfo.instructions ? `📝 *Instructions:* ${customerInfo.instructions}` : ''}
 
 💰 *Payment Method:* CASH IN PERSON
-💵 *Total to collect:* $${total.toFixed(2)}
+💵 *Total to collect:* $${total}
 
 📋 *Order Details:*
-• Subtotal: $${subtotal.toFixed(2)}
-• Cash Discount (5%): -$${discount.toFixed(2)}
-• Tax (8%): $${tax.toFixed(2)}
-• *Total: $${total.toFixed(2)}*
+• Subtotal: $${subtotal}
+• *Total: $${total}* (No tax for cash payment)
 
 🛍️ *Items:*
 ${items.map((item: { id: string; name: string; price: number; quantity: number }) => `• ${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`).join('\n')}
