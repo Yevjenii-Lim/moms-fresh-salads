@@ -128,19 +128,34 @@ export async function POST(request: NextRequest) {
           request_three_d_secure: 'automatic',
         },
       },
-      line_items: items.map((item: CartItem) => ({
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: item.name,
-            description: item.description,
-            // Only include images if they are valid URLs (not emojis)
-            ...(item.image && item.image.startsWith('http') ? { images: [item.image] } : {}),
+      line_items: [
+        // Add product line items
+        ...items.map((item: CartItem) => ({
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: item.name,
+              description: item.description,
+              // Only include images if they are valid URLs (not emojis)
+              ...(item.image && item.image.startsWith('http') ? { images: [item.image] } : {}),
+            },
+            unit_amount: Math.round(item.price * 100), // Convert to cents
           },
-          unit_amount: Math.round(item.price * 100), // Convert to cents
-        },
-        quantity: item.quantity,
-      })),
+          quantity: item.quantity,
+        })),
+        // Add tax as a separate line item if tax > 0
+        ...(tax > 0 ? [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Tax',
+              description: 'Sales Tax',
+            },
+            unit_amount: Math.round(tax * 100), // Convert to cents
+          },
+          quantity: 1,
+        }] : [])
+      ],
       mode: 'payment',
       success_url: `https://eurasianbowl.com/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `https://eurasianbowl.com/cancel`,
