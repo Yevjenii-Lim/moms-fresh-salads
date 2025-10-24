@@ -155,9 +155,9 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           items: cart,
           customerInfo,
-          subtotal: subtotal.toFixed(2),
-          tax: tax.toFixed(2),
-          total: total.toFixed(2),
+          subtotal: subtotal,
+          tax: tax,
+          total: total,
         }),
       });
 
