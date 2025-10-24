@@ -103,6 +103,12 @@ export default function CheckoutPage() {
       alert('Please enter your phone number');
       return;
     }
+    // Validate phone number format (basic US format)
+    const phoneRegex = /^[\+]?[1]?[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{4}$/;
+    if (!phoneRegex.test(customerInfo.phone.replace(/\s/g, ''))) {
+      alert('Please enter a valid phone number at least 10 digits');
+      return;
+    }
     if (!customerInfo.address?.trim()) {
       alert('Please enter your delivery address');
       return;
@@ -163,6 +169,12 @@ export default function CheckoutPage() {
     }
     if (!customerInfo.phone?.trim()) {
       alert('Please enter your phone number');
+      return;
+    }
+    // Validate phone number format (basic US format)
+    const phoneRegex = /^[\+]?[1]?[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{4}$/;
+    if (!phoneRegex.test(customerInfo.phone.replace(/\s/g, ''))) {
+      alert('Please enter a valid phone number at least 10 digits');
       return;
     }
     if (!customerInfo.address?.trim()) {
