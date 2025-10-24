@@ -322,6 +322,7 @@ export default function CheckoutPage() {
                   value={customerInfo.name}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  autoComplete="name"
                   required
                 />
               </div>
@@ -336,6 +337,7 @@ export default function CheckoutPage() {
                   value={customerInfo.email}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  autoComplete="email"
                   required={paymentMethod === 'card'}
                 />
               </div>
@@ -350,6 +352,7 @@ export default function CheckoutPage() {
                   value={customerInfo.phone}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  autoComplete="tel"
                   required
                 />
               </div>
@@ -364,6 +367,7 @@ export default function CheckoutPage() {
                   value={customerInfo.address}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  autoComplete="street-address"
                   required
                 />
               </div>
@@ -378,6 +382,7 @@ export default function CheckoutPage() {
                   onChange={handleInputChange}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  autoComplete="off"
                   placeholder="Any special requests or delivery instructions..."
                 />
               </div>
